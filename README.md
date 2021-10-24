@@ -9,7 +9,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
 
-<img src="image/derk_screen.gif " width="1000">
+<img src="image/derk_screen.gif " width="500">
 
 First, move to [dr-derks-mutant-battlegrounds folder](https://github.com/kimbring2/MOBA_RL/tree/main/dr-derks-mutant-battlegrounds).
 
