@@ -44,12 +44,12 @@ Next, you need to download and install [dotaservice](https://github.com/TimZaman
 ```
 async def _run_dota(self):
   script_path = os.path.join(self.dota_path, self.DOTA_SCRIPT_FILENAME)
-  script_path = '/home/kimbring2/.local/share/Steam/ubuntu12_32/steam-runtime/run.sh'
+  script_path = '/home/[your user name]/.local/share/Steam/ubuntu12_32/steam-runtime/run.sh'
 
   # TODO(tzaman): all these options should be put in a proto and parsed with gRPC Config.
   args = [
        script_path,
-       '/home/kimbring2/.local/share/Steam/steamapps/common/dota 2 beta/game/dota.sh',
+       '/home/[your user name]/.local/share/Steam/steamapps/common/dota 2 beta/game/dota.sh',
        '-botworldstatesocket_threaded',
        '-botworldstatetosocket_frames', '{}'.format(self.ticks_per_observation),
        '-botworldstatetosocket_radiant', '{}'.format(self.PORT_WORLDSTATES[TEAM_RADIANT]),
@@ -75,6 +75,18 @@ async def _run_dota(self):
        '+tv_transmitall', '1',  # TODO(tzaman): what does this do exactly?
   ]
 ```
+
+If you enter the following command after modification, the Dota2 game will be launched.
+
+```
+$ python -m dotaservice
+$ python env_test.py --render True
+```
+
+Dota 2 should be successfully launched and the hero selection screen should appear. When entering the main game, you can then use \ key to pop up the console. Then, try use the 'jointeam spec' command to see the hero, tower of entire map.
+
+[![Derk demo](https://i.ytimg.com/vi/GzILbfRFnZE/sddefault.jpg)](https://www.youtube.com/watch?v=GzILbfRFnZE "Dota2 launch test video - Click to Watch!")
+<strong>Click to Watch!</strong>
 
 ## Training Environment
 You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md) of Docker of the dotaservice.
