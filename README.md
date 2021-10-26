@@ -19,6 +19,8 @@ We are going to train small MOBA environment called [Derk](https://gym.derkgame.
 
 First, move to [dr-derks-mutant-battlegrounds folder](https://github.com/kimbring2/MOBA_RL/tree/main/dr-derks-mutant-battlegrounds).
 
+<img src="image/derk_network.png" width="300">
+
 Run below command to run the 50 parallel environemnt. I modified [Seel_RL](https://github.com/google-research/seed_rl) of Google for my MOBA case. 
 
 ```
@@ -38,6 +40,11 @@ After training, one team choose to attack the opponent and the other team choose
 
 # Dota2 Environment
 In the case of Derk environment, you can render game and train agent at the same time on one PC. However, in the case of dota2, PC for rendering and a PC for training are required separately because of large size of network and game, and multiple docker containers. Additionally, I use the same user name for the rendering pc and the training pc for the convenience of path setting.  
+
+## Network Architecture
+Unlike network for Derk game, which consists of one for observation processing and one for action selecting network, Dota2 agent needs a 6 observation processing networks and 5 action processing networks due to the large size of the game.
+
+<img src="image/dota2_network.png " width="300">
 
 ## Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
