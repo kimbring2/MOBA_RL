@@ -121,3 +121,6 @@ Addidinally, you can terminate all process using below command.
 ```
 $ ./stop.sh
 ```
+If you search through the tmux, you can see that 16 dotaservices is ran in one terminal and the other terminal runs 1 learner and 16 actors.
+
+<img src="image/dota2_server_log.png " width="1000">
