@@ -31,7 +31,7 @@ $ python run.py -p1 bot -p2 oldbot -n 50
 
 You can check the training progress using Tensorboard log under tboard path of workspace.
 
-<img src="image/reward_derk.png " width="600">
+<img src="image/reward_derk.png " width="800">
 
 After training, one team choose to attack the opponent and the other team choose to defend.
 
@@ -44,7 +44,7 @@ In the case of Derk environment, you can render game and train agent at the same
 ## Network Architecture
 Unlike network for Derk game, which consists of one for observation processing and one for action selecting network, Dota2 agent needs a 6 observation processing networks and 5 action processing networks due to the large size of the game.
 
-<img src="image/dota2_network.png " width="600">
+<img src="image/dota2_network.png " width="800">
 
 ## Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
