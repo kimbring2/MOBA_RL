@@ -28,7 +28,7 @@ $ python run.py -p1 bot -p2 oldbot -n 50
 
 You can check the training progress using Tensorboard log under tboard path of workspace.
 
-<img src="image/reward_derk.png " width="500">
+<img src="image/reward_derk.png " width="300">
 
 After training, one team choose to attack the opponent and the other team choose to defend.
 
