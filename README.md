@@ -19,7 +19,7 @@ We are going to train small MOBA environment called [Derk](https://gym.derkgame.
 
 First, move to [dr-derks-mutant-battlegrounds folder](https://github.com/kimbring2/MOBA_RL/tree/main/dr-derks-mutant-battlegrounds).
 
-<img src="image/derk_network.png" width="300">
+<img src="image/derk_network.png" width="800">
 
 Run below command to run the 50 parallel environemnt. I modified [Seel_RL](https://github.com/google-research/seed_rl) of Google for my MOBA case. 
 
@@ -31,7 +31,7 @@ $ python run.py -p1 bot -p2 oldbot -n 50
 
 You can check the training progress using Tensorboard log under tboard path of workspace.
 
-<img src="image/reward_derk.png " width="800">
+<img src="image/reward_derk.png " width="300">
 
 After training, one team choose to attack the opponent and the other team choose to defend.
 
