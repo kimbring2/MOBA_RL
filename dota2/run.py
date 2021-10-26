@@ -47,7 +47,7 @@ env = DotaServiceStub(Channel('127.0.0.1', 13337 + arguments.id, loop=asyncio.ge
 
 
 if arguments.id == 0:
-  writer = tf.summary.create_file_writer("/home/kimbring2/dotaservice/IMPALA/tensorboard")
+  writer = tf.summary.create_file_writer("./tensorboard")
 
 
 TICKS_PER_OBSERVATION = 15
