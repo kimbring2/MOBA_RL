@@ -28,6 +28,13 @@ $ python run.py -p1 bot -p2 oldbot -n 50
 
 You can check the training progress using Tensorboard log under tboard path of workspace.
 
+<img src="image/reward_derk.png " width="500">
+
+After training, one team choose to attack the opponent and the other team choose to defend.
+
+[![Derk demo](https://img.youtube.com/vi/avQra5Wt-wI/sddefault.jpg)](https://www.youtube.com/watch?v=avQra5Wt-wI "Derk video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
 # Dota2 Environment
 ## Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
