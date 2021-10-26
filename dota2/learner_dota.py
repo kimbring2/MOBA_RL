@@ -395,7 +395,7 @@ def learner_loop():
   agent_output_specs = tf.nest.map_structure(lambda t: tf.TensorSpec(t.shape[1:], t.dtype), initial_agent_output)
 
   init_checkpoint = None
-  logdir = "/home/kimbring2/dotaservice/tboard/agent1"
+  logdir = "model"
 
   # Setup checkpointing and restore checkpoint.
   ckpt = tf.train.Checkpoint(agent=agent, optimizer=optimizer)
