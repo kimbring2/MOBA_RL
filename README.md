@@ -2,16 +2,15 @@
 Deep Reinforcement Learning for Multiplayer Online Battle Arena
 
 # Prerequisite
-1. python 3
+1. Python 3
 2. tmux
 3. gym-derk 
-4. tensorflow 2.4.1
-5. tensorflow_probability 0.11.0
-6. dotaservice of TimZaman
-7. Seed RL of Google
-8. Ubuntu 20.04
-9. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
-10. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
+4. Tensorflow 2.4.1
+5. Dotaservice of TimZaman
+6. Seed RL of Google
+7. Ubuntu 20.04
+8. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
+9. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
 
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
@@ -96,7 +95,7 @@ $ python env_test.py --render True
 
 Dota 2 should be successfully launched and the hero selection screen should appear. When entering the main game, you can then use \ key to pop up the console. Then, try use the 'jointeam spec' command to see the hero, tower of entire map.
 
-[![Derk demo](https://i.ytimg.com/vi/GzILbfRFnZE/sddefault.jpg)](https://www.youtube.com/watch?v=GzILbfRFnZE "Dota2 launch test video - Click to Watch!")
+[![Dota launch demo](https://i.ytimg.com/vi/GzILbfRFnZE/sddefault.jpg)](https://www.youtube.com/watch?v=GzILbfRFnZE "Dota2 launch test video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
 Now, you are ready to train Dota2 with Seed RL just as we did in the Derk game. Try to run Seed RL and Dota2 together on the rendering PC with the following command. The hero behaves randomly because model does not be trained yet.
@@ -125,3 +124,25 @@ $ ./stop.sh
 If you search through the tmux, you can see that 16 dotaservices is ran in one terminal and the other terminal runs 1 learner and 16 actors.
 
 <img src="image/dota2_server_log.png " width="1000">
+
+### Single Hero Training Result
+
+In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
+
+<img src="image/dota2_single_reward.png " width="300">
+
+After finishing training, you need a trained model from training pc to rendering pc. Please copy it to the model folder and run below command at terminal.
+
+```
+$ python -m dotaservice
+$ python learner_dota.py
+$ python3.7 run.py --render True
+```
+
+On the rendering PC, you can check the training result better than the graph as shown in the video below. The hero learns how to move to mid area and attack enermy creep.
+
+[![Dota single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
+### Buying and using item
+Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
