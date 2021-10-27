@@ -2,15 +2,16 @@
 Deep Reinforcement Learning for Multiplayer Online Battle Arena
 
 # Prerequisite
-1. Python 3
+1. python 3
 2. tmux
 3. gym-derk 
-4. Tensorflow 2.4.1
-5. Dotaservice of TimZaman
-6. Seed RL of Google
-7. Ubuntu 20.04
-8. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
-9. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
+4. tensorflow 2.4.1
+5. tensorflow_probability 0.11.0
+6. dotaservice of TimZaman
+7. Seed RL of Google
+8. Ubuntu 20.04
+9. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
+10. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
 
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
