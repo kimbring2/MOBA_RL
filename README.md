@@ -129,7 +129,7 @@ If you search through the tmux, you can see that 16 dotaservices is ran in one t
 
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
-<img src="image/dota2_single_reward.png " width="300">
+<img src="image/dota2_single_reward.png " width="800">
 
 After finishing training, you need a trained model from training pc to rendering pc. Please copy it to the model folder and run below command at terminal.
 
