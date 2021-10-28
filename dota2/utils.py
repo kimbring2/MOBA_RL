@@ -270,9 +270,7 @@ def action_masks(player_unit, unit_handles):
     return masks
 
   masks = {key: np.ones((1, 1, val)) for key, val in ACTION_OUTPUT_COUNTS.items()}
-  #print("masks b: ", masks)
   for ability in player_unit.abilities:
-    #print("ability: ", ability)
 
     if ability.slot >= 3:
       continue
@@ -284,25 +282,20 @@ def action_masks(player_unit, unit_handles):
       #print("Can't use ability")
       masks['ability'][0, 0, ability.slot] = 0
 
-  #print("masks a: ", masks)
   if not masks['ability'].any():
     # No abilities possible, so we cannot choose to use any abilities.
     masks['enum'][0, 0, 3] = 0
 
   valid_units = unit_handles != -1
-  #print("valid_units b: ", valid_units)
 
   valid_units[0] = 0 # The 'self' hero can never be targetted.
 
-  #print("valid_units a: ", valid_units)
   if not valid_units.any():
     # All units invalid, so we cannot choose the high-level attack head:
     masks['enum'][0, 0, 2] = 0
 
-  #print("valid_units: ", valid_units)
   masks['target_unit'][0, 0] = valid_units
 
-  #print("")
   return masks
 
 
@@ -314,17 +307,7 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
   action_pb.player = unit_id
   action_enum = action_dict['enum']
 
-  #print("unit_handles: ", unit_handles)
-  #print("action_enum: ", action_enum)
-
   hero_location = hero_unit.location
-  #print("hero_location: ", hero_location)
-  #if hero_location.x > 0 or hero_location.y > 0:
-  #  action_enum = 2
-  #else:
-  #  action_enum = 1
-
-  #action_enum = 0
 
   if action_enum == 0:
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
@@ -333,27 +316,17 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
     m = CMsgBotWorldState.Action.MoveToLocation()
     hero_location = hero_unit.location
 
-    #action_dict['x'] = 2
-    #action_dict['y'] = 2
-
     m.location.x = hero_location.x + MOVE_ENUMS[action_dict['x']]
     m.location.y = hero_location.y + MOVE_ENUMS[action_dict['y']]
-    #m.location.x = 300
-    #m.location.y = 300
     m.location.z = 0
     action_pb.moveDirectly.CopyFrom(m)
   elif action_enum == 2:
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_ATTACK_TARGET')
     m = CMsgBotWorldState.Action.AttackTarget()
     if 'target_unit' in action_dict:
-      #print("action_dict['target_unit']: ", action_dict['target_unit'])
       m.target = unit_handles[action_dict['target_unit']]
     else:
       m.target = -1
-
-    #print("m.target: ", m.target)
-    #m.target = 62
-    #m.target = unit_handles[action_dict['target_unit']]
 
     m.once = False
     action_pb.attackTarget.CopyFrom(m)
@@ -367,47 +340,6 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
     
   return action_pb
 
-'''
-class MaskedCategorical():
-  def __init__(self, log_probs, mask):
-    self.log_probs = log_probs
-    #mask = tf.cast(mask, 'int32')
-    #self.masked_probs = tf.math.exp(log_probs)
-    #tf.print("heads_logits 4: ", self.masked_probs)
-    #self.masked_probs *= tf.cast(tf.not_equal(mask, 0), 'float32')
-    #tf.print("tf.math.reduce_sum(self.masked_probs, axis=1, keepdims=True): ", tf.math.reduce_sum(self.masked_probs, axis=1, keepdims=True))
-    #tf.print("heads_logits 5: ", self.masked_probs)
-    #tf.print("")
-
-  def sample(self):
-    return tfd.Categorical(probs=self.log_probs[-1]).sample()
-
-
-def masked_softmax(logits, mask, dim=1):
-  #tf.print("logits: ", logits)
-  """Returns log-probabilities."""
-  mask = tf.cast(mask, 'int32')
-  exp = tf.math.exp(logits)
-  #tf.print("heads_logits 2: ", exp)
-
-  masked_exp = exp
-  masked_exp *= tf.cast(tf.not_equal(mask, 0), 'float32')
-  #tf.print("masked_exp: ", masked_exp)
-  masked_sumexp = tf.math.reduce_sum(masked_exp, axis=dim, keepdims=True)
-  #tf.print("masked_sumexp: ", masked_sumexp)
-  logsumexp = tf.math.log(masked_sumexp)
-
-  #log_probs = logits / logsumexp
-  log_probs = logits - logsumexp
-  #tf.print("heads_logits 3: ", log_probs)
-  masked_logits = logits * tf.cast(tf.not_equal(mask, 0), 'float32')
-  #print("masked_logits: ", masked_logits)
-
-  masked_log_logits = tf.keras.layers.Softmax()(masked_logits)
-  #print("log_probs: ", log_probs)
-
-  return masked_log_logits, tf.expand_dims(masked_logits, 0)
-'''
 
 @tf.function
 def sample_action(logits, mask):
@@ -564,14 +496,6 @@ def sample_ability_actions(logits, mask):
 def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits):
   """From all heads, select actions."""
   # First select the high-level action.
-  #tf.print("masked_heads_logits['enum'].shape: ", masked_heads_logits['enum'].shape)
-  #masked_heads_logits['enum'] = heads_logits['enum']
-  #masked_heads_logits['x'] = heads_logits['x']
-  #masked_heads_logits['y'] = heads_logits['y']
-  #masked_heads_logits['target_unit'] = heads_logits['target_unit']
-  #masked_heads_logits['ability'] = heads_logits['ability']
-
-  #tf.print("action_dict['enum']: ", action_dict['enum'])
   action_dict['enum'], enum_masked_probs = sample_action(heads_logits['enum'][0], action_masks['enum'][0])
   masked_heads_logits['enum'] = enum_masked_probs
 
