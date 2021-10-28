@@ -137,7 +137,6 @@ class Dota(tf.Module):
   def _head(self, torso_output):
     unit_embedding, x, enum_mask, x_mask, y_mask, target_unit_mask, ability_mask = torso_output
     batch_size = unit_embedding.shape[0]
-    #tf.print("batch_size: ", batch_size)
 
     unit_attention = self.affine_unit_attention(x) 
     unit_attention = tf.expand_dims(unit_attention, 1)
@@ -150,20 +149,7 @@ class Dota(tf.Module):
     action_ability = self.affine_head_ability(x)
 
     baseline = tf.squeeze(self._baseline(x), axis=-1)
-    '''
-    enum_action = tf.TensorArray(dtype=tf.int32, size=0, dynamic_size=True)
-    x_action = tf.TensorArray(dtype=tf.int32, size=0, dynamic_size=True)
-    y_action = tf.TensorArray(dtype=tf.int32, size=0, dynamic_size=True)
-    target_unit_action = tf.TensorArray(dtype=tf.int32, size=0, dynamic_size=True)
-    ability_action = tf.TensorArray(dtype=tf.int32, size=0, dynamic_size=True)
 
-    enum_logits = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
-    x_logits = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
-    y_logits = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
-    target_logits = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
-    ability_logits = tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)
-    '''
-    #for i in range(0, batch_size):
     enum_action_list = []
     x_action_list = []
     y_action_list = []
@@ -221,9 +207,6 @@ class Dota(tf.Module):
       target_unit_action_list.append(action_dict['target_unit'])
       ability_action_list.append(action_dict['ability'])
 
-      #tf.print("action_scores_enum[i]: ", action_scores_enum[i])
-      #tf.print("masked_heads_logits['enum'][0][0]: ", masked_heads_logits['enum'][0][0])
-      #tf.print("action_dict['enum']: ", action_dict['enum'])
       enum_logits_list.append(masked_heads_logits['enum'][0][0])
       x_logits_list.append(masked_heads_logits['x'][0][0])
       y_logits_list.append(masked_heads_logits['y'][0][0])
@@ -242,33 +225,6 @@ class Dota(tf.Module):
     target_unit_logits_list = tf.stack(target_unit_logits_list)
     ability_logits_list = tf.stack(ability_logits_list)
 
-    # Sample an action from the policy.
-    #new_enum = self._enum_parametric_action_distribution.sample(action_scores_enum)
-    #new_x = self._x_parametric_action_distribution.sample(action_scores_x)
-    #new_y = self._y_parametric_action_distribution.sample(action_scores_y)
-    #new_target_unit = self._target_unit_parametric_action_distribution.sample(action_target_unit)
-    #new_ability = self._ability_parametric_action_distribution.sample(action_ability)
-    '''
-    tf.print("action_scores_enum: ", action_scores_enum)
-    tf.print("action_scores_x: ", action_scores_x)
-    tf.print("action_scores_y: ", action_scores_y)
-    tf.print("action_target_unit: ", action_target_unit)
-    tf.print("action_ability: ", action_ability)
-
-    tf.print("enum_mask: ", enum_mask)
-    tf.print("x_mask: ", x_mask)
-    tf.print("y_mask: ", y_mask)
-    tf.print("target_unit_mask: ", target_unit_mask)
-    tf.print("ability_mask: ", ability_mask)
-    
-    tf.print("enum_logits: ", enum_logits)
-    tf.print("x_logits: ", x_logits)
-    tf.print("y_logits: ", y_logits)
-    tf.print("target_logits: ", target_logits)
-    tf.print("ability_logits: ", ability_logits)
-    '''
-    
-    #tf.print("")
 
     return AgentOutput(enum_action_list, enum_logits_list, x_action_list, x_logits_list, y_action_list, 
                        y_logits_list, target_unit_action_list, target_unit_logits_list, ability_action_list, 
