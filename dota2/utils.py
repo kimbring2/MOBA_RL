@@ -177,9 +177,6 @@ def unit_matrix(unit_list, hero_unit, only_self=False, max_units=16):
     m = np.zeros((max_units, 12))
     i = 0
     for unit in unit_list:
-        #print("i: ", i)
-        #print("unit.handle: ", unit.handle)
-
         if unit.is_alive:
             if only_self:
                 if unit != hero_unit:
@@ -230,17 +227,11 @@ def unit_matrix(unit_list, hero_unit, only_self=False, max_units=16):
             # HACK: Make a nice interface for this, per enum used?
             if unit.is_invulnerable or unit.is_attack_immune:
                 handles[i] = -1
-                #print("con 1")
             elif unit.team_id == hero_unit.team_id and unit.unit_type == CMsgBotWorldState.UnitType.Value('TOWER'):
                 # Its own tower:
                 handles[i] = -1
-                #print("con 3")
             else:
                 handles[i] = unit.handle
-
-            #print("i: ", i)
-            #print("handles[i]: ", handles[i])
-            #print("")
 
             i += 1
               
@@ -248,19 +239,11 @@ def unit_matrix(unit_list, hero_unit, only_self=False, max_units=16):
 
 
 def ability_available(ability):
-  #print("ability.ability_id: ", ability.ability_id)
-  #print("ability.is_activated: ", ability.is_activated)
-  #print("ability.level: ", ability.level)
-  #print("ability.cooldown_remaining: ", ability.cooldown_remaining)
-  #print("ability.is_fully_castable: ", ability.is_fully_castable)
-  #print("")
-
   return ability.is_activated and ability.level > 0 and ability.cooldown_remaining == 0 \
                 and ability.is_fully_castable
 
 
 def action_masks(player_unit, unit_handles):
-  #print("player_unit.is_alive: ", player_unit.is_alive)
   """Mask the head with possible actions."""
   if not player_unit.is_alive:
     # Dead player means it can only do the NoOp.
@@ -512,12 +495,8 @@ def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits)
                                                                          action_masks['target_unit'][0])
     masked_heads_logits['target_unit'] = target_unit_masked_probs
   elif action_dict['enum'] == 3:  # Ability
-    #tf.print("heads_logits['ability']: ", heads_logits['ability'])
-    #tf.print("action_masks['ability']: ", action_masks['ability'])
     action_dict['ability'], ability_masked_probs = sample_ability_actions(heads_logits['ability'][0], 
                                                                  action_masks['ability'][0])
-    #tf.print("ability_masked_probs: ", ability_masked_probs)
-    #tf.print("")
     masked_heads_logits['ability'] = ability_masked_probs
   else:
     ValueError("Invalid Action Selection.")
