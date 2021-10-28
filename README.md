@@ -168,7 +168,11 @@ local PurchaseItem = {}
 PurchaseItem.Name = "Purchase Item"
 PurchaseItem.NumArgs = 2
 
-local tableItemsToBuy = {"item_tango", "item_clarity", "item_branches", "item_magic_stick", "item_circlet", "item_boots"};
+local tableItemsToBuy = { 
+				"item_tango",
+				"item_tango",
+			};
+
 
 ----------------------------------------------------------------------------------------------------
 
