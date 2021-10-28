@@ -146,3 +146,52 @@ On the rendering PC, you can check the training result better than the graph as 
 
 ## 4. Buying and using item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
+
+To add the ability to purchase and use items, you must first add a below code line to the [action_processor.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/action_processor.lua) of dotaservice.
+
+```
+local purchaseItem              = require( "bots/actions/purchase_item" )
+```
+
+Then add the following line to the [bot_generic.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/bot_generic.lua) file.
+
+```
+elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
+        action_table[action.actionType] = {{action.purchaseItem.item_name}}
+```
+
+Finally, make the purchase_item.lua file to your [actions](https://github.com/TimZaman/dotaservice/tree/master/dotaservice/lua/actions) folder and copy the following content.
+
+```
+local PurchaseItem = {}
+
+PurchaseItem.Name = "Purchase Item"
+PurchaseItem.NumArgs = 2
+
+local tableItemsToBuy = { 
+				"item_tango", "item_clarity", "item_branches", "item_magic_stick", "item_circlet", "item_boots"
+      };
+
+----------------------------------------------------------------------------------------------------
+
+function PurchaseItem:Call( hUnit, item_name )
+	if ( #tableItemsToBuy == 0 )
+	then
+		hUnit:SetNextItemPurchaseValue( 0 );
+		return;
+	end
+
+	local sNextItem = "item_tango"
+  
+	hUnit:SetNextItemPurchaseValue( GetItemCost( sNextItem ) );
+	if ( hUnit:GetGold() >= GetItemCost( sNextItem ) )
+	then
+		hUnit:ActionImmediate_PurchaseItem( sNextItem );
+		table.remove( tableItemsToBuy, 1 );
+	end
+
+end
+
+----------------------------------------------------------------------------------------------------
+return PurchaseItem
+```
