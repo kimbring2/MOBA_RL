@@ -61,20 +61,26 @@ async def reset():
 
 
 skill_flag = False
-item_flag = True
-move_flag = False
+item_flag = False
+move_flag = True
+tree_flag = False
 async def step():
   global skill_flag
   global item_flag
+  global move_flag
+  global tree_flag
 
   response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
   #print('response.world_state: ', response.world_state)
+  dota_time = response.world_state.dota_time
   print('response.world_state.dota_time: ', response.world_state.dota_time)
 
   hero_unit = None
   enermy_hero = None
   for unit in response.world_state.units:
+    #print("unit.name: ", unit.name)
     #print("unit.team_id: ", unit.team_id)
+    #print("")
     if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO') and unit.name == "npc_dota_hero_nevermore" \
       and unit.team_id == 2:
       hero_unit = unit
@@ -84,6 +90,7 @@ async def step():
       and unit.team_id == 3:
       enermy_hero = unit
 
+  #print("enermy_hero: ", enermy_hero)
   #print("enermy_hero: ", enermy_hero)
 
   mid_tower = None
@@ -98,14 +105,16 @@ async def step():
   #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_CHAT')
   
   hero_location = hero_unit.location
-  #print("hero_location: ", hero_location)
+  hero_item = hero_unit.items
+  #print("hero_item: ", hero_item)
 
-  if abs(mid_tower_location.x - hero_location.x) or abs(mid_tower_location.y - hero_location.y):
-    move_flag = True
+  if move_flag == False:
+    if (abs(mid_tower_location.x + 800 - hero_location.x) >= 500) or (abs(mid_tower_location.y + 800 - hero_location.y) >= 500):
+      move_flag = True
 
   m = CMsgBotWorldState.Action.MoveToLocation()
-  m.location.x = mid_tower_location.x
-  m.location.y = mid_tower_location.y
+  m.location.x = mid_tower_location.x + 800
+  m.location.y = mid_tower_location.y + 800
   m.location.z = 0
   
   c = CMsgBotWorldState.Action.Chat()
@@ -113,7 +122,7 @@ async def step():
   c.to_allchat = 1
 
   i = CMsgBotWorldState.Action.PurchaseItem()
-  #i.item = 2
+  i.item = 2
   i.item_name = "item_tango"
 
   t = CMsgBotWorldState.Action.CastTree()
@@ -122,29 +131,46 @@ async def step():
 
   #action_pb.chat.CopyFrom(t) 
   action_pb = CMsgBotWorldState.Action()
-  if item_flag == False:
-    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
-    action_pb.purchaseItem.CopyFrom(i) 
-    item_flag = True
-  elif skill_flag == False:
-    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
-    action_pb.player = 0
-    action_pb.trainAbility.ability = "nevermore_shadowraze1"
-    skill_flag = True
-  elif move_flag == True:
-    action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
-    action_pb.player = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
-    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_MOVE_DIRECTLY')
-    action_pb.moveDirectly.CopyFrom(m)
-    move_flag = False
+  if dota_time > -80.0:
+    if item_flag == False:
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
+      action_pb.player = 0
+      action_pb.purchaseItem.CopyFrom(i) 
+      item_flag = True
+    elif tree_flag == False and item_flag == True:
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
+      action_pb.player = 0
+      action_pb.castTree.CopyFrom(t) 
+      tree_flag = True
+    elif skill_flag == False:
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
+      action_pb.player = 0
+      action_pb.trainAbility.ability = "nevermore_shadowraze1"
+      skill_flag = True
+    elif move_flag == False:
+      action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
+      action_pb.player = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_MOVE_DIRECTLY')
+      action_pb.moveDirectly.CopyFrom(m)
+      move_flag = False
+    elif enermy_hero:
+      #print("enermy_hero.handle: ", enermy_hero.handle)
+      #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+      action_pb.player = 0 
+      action_pb.cast.abilitySlot = 2
+      #action_pb.castTarget.target = enermy_hero.handle
+    else:
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
   else:
-    #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
-    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-    action_pb.player = 0 
-    action_pb.castTarget.abilitySlot = 0
-    action_pb.castTarget.target = 0
-
+    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+  
   print("action_pb: ", action_pb)
+  #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
+  #action_pb.player = 0 
+  #action_pb.purchaseItem.CopyFrom(i) 
+  #item_flag = True
+
   actions = []
   for i in range(0, 1):
     actions.append(action_pb)
