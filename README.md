@@ -141,7 +141,7 @@ $ python3.7 run.py --render True
 
 On the rendering PC, you can check the training result better than the graph as shown in the video below. The hero learns how to move to mid area and attack enermy creep.
 
-[![Dota single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
+[![Dota2 single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
 ## 4. Buying and using item
@@ -263,3 +263,23 @@ return UseAbilityOnTree
 ```
 
 The trees around hero can be found using the GetNearbyTrees function of Lua. You need to give a 0 as an index for the GetItemInSlot function because the Tango is stored at the first place of the hero slot.
+
+Just like buying a Tango item, you can use the Tango item as in the code below after implementing the Lua script.
+
+```
+t = CMsgBotWorldState.Action.CastTree()
+t.abilitySlot = 0
+t.tree = 50
+
+action_pb = CMsgBotWorldState.Action()
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
+action_pb.player = 0
+action_pb.castTree.CopyFrom(t) 
+```
+
+The arguments such as item, item_name, tree is not actually used. Howerver, I just leave it as it was becasue it is difficult to delete.
+
+After implementing all of the above Lua scripts, hero can purchase and use Tango items like a below video.
+
+[![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
+<strong>Click to Watch!</strong>
