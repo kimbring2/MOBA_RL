@@ -147,6 +147,10 @@ On the rendering PC, you can check the training result better than the graph as 
 ## 4. Buying and using item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
+The Tango that is most basic item can be purchased at the store when start of game. Hero can use it on the surrounding trees to regenerate the health. Let's see how to write a code this item.
+
+<img src="image/tango_description.jpg " width="600">
+
 To add the ability to purchase and use items, you must first add a below code line to the [action_processor.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/action_processor.lua) of dotaservice.
 
 ```
@@ -197,3 +201,65 @@ end
 ----------------------------------------------------------------------------------------------------
 return PurchaseItem
 ```
+
+Lua script for item can be used in Python as below code. If you put this part at the beginning of the game, the hero is able to battle more long time.
+
+```
+i = CMsgBotWorldState.Action.PurchaseItem()
+i.item = 0
+i.item_name = "item_tango"
+
+action_pb = CMsgBotWorldState.Action()
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
+action_pb.player = 0
+action_pb.purchaseItem.CopyFrom(i) 
+```
+
+As explained above, Tango items can be used for tree object. The fastest way for that is to find the closest tree near hero and use it as the target. To implement this method, you need to change the contents of the [use_ability_on_tree.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/actions/use_ability_on_tree.lua) file little bit.
+
+```
+local UseAbilityOnTree = {}
+
+UseAbilityOnTree.Name = "Use Ability On Tree"
+UseAbilityOnTree.NumArgs = 4
+
+-------------------------------------------------
+function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
+    local hItem_1 = hUnit:GetItemInSlot(0)
+    local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    if not hAbility then
+        print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
+        do return end
+    end
+
+    intTree = intTree[1]
+    iType = iType[1]
+
+    -- Note: we do not test if the tree can be ability-targeted due to
+    -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
+    -- We assume only valid and legal actions are agent selected
+    local tableNearbyTrees = hUnit:GetNearbyTrees(500);
+    if tableNearbyTrees[1] then
+        intTree = tableNearbyTrees[1]
+    end
+
+    local vLoc = GetTreeLocation(intTree)
+
+    DebugDrawCircle(vLoc, 25, 255, 0, 0)
+    DebugDrawLine(hUnit:GetLocation(), vLoc, 255, 0, 0)
+
+    hAbility = hItem_1
+    if iType == nil or iType == ABILITY_STANDARD then
+        hUnit:Action_UseAbilityOnTree(hAbility, intTree)
+    elseif iType == ABILITY_PUSH then
+        hUnit:ActionPush_UseAbilityOnTree(hAbility, intTree)
+    elseif iType == ABILITY_QUEUE then
+        hUnit:ActionQueue_UseAbilityOnTree(hAbility, intTree)
+    end
+end
+-------------------------------------------------
+
+return UseAbilityOnTree
+```
+
+The trees around hero can be found using the GetNearbyTrees function of Lua. You need to give a 0 as an index for the GetItemInSlot function because the Tango is stored at the first place of the hero slot.
