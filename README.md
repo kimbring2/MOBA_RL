@@ -172,11 +172,7 @@ local PurchaseItem = {}
 PurchaseItem.Name = "Purchase Item"
 PurchaseItem.NumArgs = 2
 
-local tableItemsToBuy = { 
-				"item_tango",
-				"item_tango",
-			};
-
+local tableItemsToBuy = { "item_tango", "item_tango"};
 
 ----------------------------------------------------------------------------------------------------
 
