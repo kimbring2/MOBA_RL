@@ -32,7 +32,26 @@ end
 
 print('PLYRS', json.encode(players))
 
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+
 local function act(action)
+    --print("dump(action): ", dump(action))
+    -- [VScript] dump(action):  { ["player"] = 0,["actionDelay"] = 328,["purchaseItem"] = { ["itemName"] = item_tango,["item"] = 2,} ,["actionType"] = DOTA_UNIT_ORDER_PURCHASE_ITEM,} 
+    -- [VScript] dump(action):  { ["player"] = 0,["chat"] = { ["message"] = test,["toAllchat"] = true,} ,["actionDelay"] = 58,["actionType"] = ACTION_CHAT,} 
+
     local action_table = {}
     if action.actionType == "DOTA_UNIT_ORDER_NONE" then
         action_table[action.actionType] = {}
@@ -68,7 +87,7 @@ local function act(action)
     elseif action.actionType == "DOTA_UNIT_ORDER_BUYBACK" then
         action_table[action.actionType] = {}
     elseif action.actionType == "ACTION_CHAT" then
-        action_table[action.actionType] = {{action.chat.message}, {action.chat.to_allchat}}
+        action_table[action.actionType] = {{action.chat.message}, {action.chat.toAllchat}}
     elseif action.actionType == "DOTA_UNIT_ORDER_CAST_POSITION" then
         action_table[action.actionType] = {{action.castLocation.abilitySlot}, {action.castLocation.location.x, action.castLocation.location.y, 0.0}, {0}}
     elseif action.actionType == "DOTA_UNIT_ORDER_CAST_TARGET" then
@@ -88,7 +107,7 @@ local function act(action)
     elseif action.actionType == "ACTION_COURIER" then
         action_table[action.actionType] = {{action.courier.courier}, {action.courier.action}}
     elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
-        action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.item_name}}
+        action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.itemName}}
     end
     action_proc:Run(GetBot(), action_table)
 end
