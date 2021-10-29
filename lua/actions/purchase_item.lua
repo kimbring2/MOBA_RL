@@ -8,6 +8,10 @@ PurchaseItem.NumArgs = 3
 local tableItemsToBuy = { 
 				"item_tango",
 				"item_tango",
+				"item_tango",
+				"item_tango",
+				"item_tango",
+				"item_tango"
 			};
 
 
@@ -31,6 +35,7 @@ function PurchaseItem:Call( hUnit, item, item_name )
     --print("type(item): ", type(item))
     --print("item: ", item)
     --print("dump(item): ", dump(item))
+    print("dump(item_name[1]): ", dump(item_name[1]))
     --print("tostring(item_name): ", tostring(item_name))
 
 	if ( #tableItemsToBuy == 0 )
@@ -39,25 +44,8 @@ function PurchaseItem:Call( hUnit, item, item_name )
 		return;
 	end
 
-	local sNextItem = tableItemsToBuy[1];
-	--local sNextItem = "item_tango"
-
-	hUnit:SetNextItemPurchaseValue( GetItemCost( sNextItem ) );
-
-	if ( hUnit:GetGold() >= GetItemCost( sNextItem ) )
-	then
-		hUnit:ActionImmediate_PurchaseItem( sNextItem );
-		table.remove( tableItemsToBuy, 1 );
-	end
-
-end
-
-----------------------------------------------------------------------------------------------------
-return PurchaseItem
-
-	end
-
-	local sNextItem = tableItemsToBuy[1];
+	--local sNextItem = tableItemsToBuy[1];
+	local sNextItem = item_name[1]
 
 	hUnit:SetNextItemPurchaseValue( GetItemCost( sNextItem ) );
 
