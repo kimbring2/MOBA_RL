@@ -97,13 +97,8 @@ def compute_loss(logger, enum_parametric_action_distribution,
   target_unit_target_action_log_probs = target_unit_parametric_action_distribution.log_prob(learner_outputs.target_unit_logits, agent_outputs.target_unit)
   target_unit_behaviour_action_log_probs = target_unit_parametric_action_distribution.log_prob(agent_outputs.target_unit_logits, agent_outputs.target_unit)
 
-  #print("learner_outputs.ability_logits: " + str(learner_outputs.ability_logits))
-  #print("agent_outputs.ability_logits: " + str(agent_outputs.ability_logits))
-  #print("agent_outputs.ability: " + str(agent_outputs.ability))
   ability_target_action_log_probs = ability_parametric_action_distribution.log_prob(learner_outputs.ability_logits, agent_outputs.ability)
   ability_behaviour_action_log_probs = ability_parametric_action_distribution.log_prob(agent_outputs.ability_logits, agent_outputs.ability)
-  #print("ability_target_action_log_probs: " + str(ability_target_action_log_probs))
-  #print("ability_behaviour_action_log_probs: " + str(ability_behaviour_action_log_probs))
 
   # Compute V-trace returns and weights.
   lambda_ = 1.0
@@ -131,8 +126,6 @@ def compute_loss(logger, enum_parametric_action_distribution,
       target_action_log_probs=ability_target_action_log_probs, behaviour_action_log_probs=ability_behaviour_action_log_probs,
       discounts=discounts, rewards=rewards, values=learner_outputs.baseline, bootstrap_value=bootstrap_value,
       lambda_=lambda_)
-
-  #print("vtrace_returns: " + str(vtrace_returns))
 
   # Policy loss based on Policy Gradients
   enum_policy_loss = -tf.reduce_mean(enum_target_action_log_probs * tf.stop_gradient(enum_vtrace_returns.pg_advantages))
@@ -191,20 +184,9 @@ def compute_loss(logger, enum_parametric_action_distribution,
   y_total_loss = (y_policy_loss + y_v_loss + y_entropy_loss + kl_loss + entropy_adjustment_loss)
   target_unit_total_loss = (target_unit_policy_loss + target_unit_v_loss + target_unit_entropy_loss + kl_loss + entropy_adjustment_loss)
 
-  #print("ability_policy_loss: " + str(ability_policy_loss))
-  #print("ability_v_loss: " + str(ability_v_loss))
-  #print("ability_entropy_loss: " + str(ability_entropy_loss))
   ability_total_loss = (ability_policy_loss + ability_v_loss + ability_entropy_loss + kl_loss + entropy_adjustment_loss)
-  #print("enum_total_loss: " + str(enum_total_loss))
-  #print("x_total_loss: " + str(x_total_loss))
-  #print("y_total_loss: " + str(y_total_loss))
-  #print("target_unit_total_loss: " + str(target_unit_total_loss))
-  #print("ability_total_loss: " + str(ability_total_loss))
 
   total_loss = enum_total_loss + x_total_loss + y_total_loss + target_unit_total_loss + ability_total_loss
-  tf.print("total_loss: ", total_loss)
-  tf.print("")
-  #print("total_loss: ", total_loss)
 
   # value function
   session = logger.log_session()
@@ -287,13 +269,14 @@ def learner_loop():
       tf.TensorSpec([], tf.int32, 'x'),
       tf.TensorSpec([], tf.int32, 'y'),
       tf.TensorSpec([], tf.int32, 'target_unit'),
-      tf.TensorSpec([], tf.int32, 'ability')
+      tf.TensorSpec([], tf.int32, 'ability'),
+      tf.TensorSpec([], tf.int32, 'item')
   )
   
   agent_input_specs = (action_specs, env_output_specs)
 
   # Initialize agent and variables.
-  enum_parametric_action_distribution = get_parametric_distribution_for_action_space(Discrete(4))
+  enum_parametric_action_distribution = get_parametric_distribution_for_action_space(Discrete(5))
   x_parametric_action_distribution = get_parametric_distribution_for_action_space(Discrete(N_MOVE_ENUMS))
   y_parametric_action_distribution = get_parametric_distribution_for_action_space(Discrete(N_MOVE_ENUMS))
   target_unit_parametric_action_distribution = get_parametric_distribution_for_action_space(Discrete(128))
@@ -471,10 +454,6 @@ def learner_loop():
 
           envs_needing_reset = tf.gather(env_ids, reset_indices)
 
-          #tf.print("info_queue.size(): ", info_queue.size())
-          #tf.print("unroll_queue.size(): ", unroll_queue.size())
-          #tf.print(tf.not_equal(tf.shape(envs_needing_reset)[0], 0))
-          #tf.print("")
           if tf.not_equal(tf.shape(envs_needing_reset)[0], 0):
             tf.print('Environment ids needing reset:', envs_needing_reset)
 
@@ -494,14 +473,11 @@ def learner_loop():
 
           # Update steps and return.
           env_infos.add(env_ids, (0, env_outputs.reward, raw_rewards))
-          #tf.print("env_outputs.reward: ", env_outputs.reward)
 
           done_ids = tf.gather(env_ids, tf.where(env_outputs.done)[:, 0])
 
           if i == 0:
             info_queue.enqueue_many(env_infos.read(done_ids))
-
-          #tf.print("info_queue.size(): ", info_queue.size())
 
           env_infos.reset(done_ids)
           env_infos.add(env_ids, (num_action_repeats, 0., 0.))
@@ -515,10 +491,8 @@ def learner_loop():
 
           input_ = encode(((prev_enum_actions, prev_x_actions, prev_y_actions, prev_target_unit_actions, prev_ability_actions),
                            env_outputs))
-          #input_ = encode(((prev_enum_actions, ), env_outputs))
           prev_agent_states = agent_states.read(env_ids)
 
-          #print("inference_device: " + str(inference_device))
           with tf.device(inference_device):
             @tf.function
             def agent_inference(*args):
@@ -527,14 +501,9 @@ def learner_loop():
             agent_outputs, curr_agent_states = agent_inference(*input_, prev_agent_states)
 
           # Append the latest outputs to the unroll and insert completed unrolls in queue.
-          #tf.print("env_ids: ", env_ids)
           completed_ids, unrolls = store.append(env_ids, ((prev_enum_actions, prev_x_actions, prev_y_actions, 
             prev_target_unit_actions, prev_ability_actions), env_outputs, agent_outputs))
-          #tf.print("completed_ids: ", completed_ids)
 
-          # Unroll = collections.namedtuple('Unroll', 'agent_state prev_actions env_outputs agent_outputs')
-          #tf.print("*unrolls: ", *unrolls)
-          #tf.print("")
           unrolls = Unroll(first_agent_states.read(completed_ids), *unrolls)
           unroll_queue.enqueue_many(unrolls)
           first_agent_states.replace(completed_ids, agent_states.read(completed_ids))
@@ -560,9 +529,7 @@ def learner_loop():
       unroll_queues.append(unroll_queue)
       servers.append(server)
 
-  #print("hosts: " + str(hosts))
   for i, (host, inference_devices) in enumerate(hosts):
-    #print("inference_devices: " + str(inference_devices))
     create_host(i, host, inference_devices)
 
 
@@ -617,14 +584,12 @@ def learner_loop():
 
   #logger.start(additional_logs)
 
-  #print("final_iteration: " + str(final_iteration))
   # Execute learning.
   while iterations < final_iteration:
     #print("iterations: " + str(iterations))
 
     # Save checkpoint.
     current_time = time.time()
-    #tf.print("current_time: " + str(current_time))
 
     save_checkpoint_secs = 1800
     if current_time - last_ckpt_time >= save_checkpoint_secs:
