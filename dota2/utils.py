@@ -305,8 +305,8 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
   action_pb.player = unit_id
   action_enum = action_dict['enum']
 
-  action_enum = 3
-  action_dict['ability'] = 2
+  action_enum = 4
+  action_dict['item'] = 0
 
   hero_location = hero_unit.location
   if action_enum == 0:
@@ -338,7 +338,6 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
     t.abilitySlot = action_dict['item']
     t.tree = 50
 
-    action_pb = CMsgBotWorldState.Action()
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
     action_pb.castTree.CopyFrom(t) 
   else:
