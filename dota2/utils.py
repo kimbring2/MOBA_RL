@@ -27,7 +27,7 @@ MOVE_ENUMS = np.arange(N_MOVE_ENUMS, dtype=np.float32) - int(N_MOVE_ENUMS / 2)
 MOVE_ENUMS *= MAX_MOVE_IN_OBS / (N_MOVE_ENUMS - 1) * 2
 OBSERVATIONS_PER_SECOND = TICKS_PER_SECOND / TICKS_PER_OBSERVATION
 MAX_UNITS = 1 + 5 + 16 + 16 + 1 + 1
-ACTION_OUTPUT_COUNTS = {'enum': 4, 'x': 9, 'y': 9, 'target_unit': MAX_UNITS, 'ability': 3}
+ACTION_OUTPUT_COUNTS = {'enum': 5, 'x': 9, 'y': 9, 'target_unit': MAX_UNITS, 'ability': 3, 'item': 3}
 OUTPUT_KEYS = ACTION_OUTPUT_COUNTS.keys()
 INPUT_KEYS = ['env', 'allied_heroes', 'enemy_heroes', 'allied_nonheroes', 'enemy_nonheroes',
               'allied_towers', 'enemy_towers']
@@ -240,7 +240,12 @@ def unit_matrix(unit_list, hero_unit, only_self=False, max_units=16):
 
 def ability_available(ability):
   return ability.is_activated and ability.level > 0 and ability.cooldown_remaining == 0 \
-                and ability.is_fully_castable
+      and ability.is_fully_castable
+
+
+def item_available(item):
+  return item.is_activated and item.level > 0 and item.cooldown_remaining == 0 \
+      and item.is_fully_castable
 
 
 def action_masks(player_unit, unit_handles):
@@ -254,7 +259,6 @@ def action_masks(player_unit, unit_handles):
 
   masks = {key: np.ones((1, 1, val)) for key, val in ACTION_OUTPUT_COUNTS.items()}
   for ability in player_unit.abilities:
-
     if ability.slot >= 3:
       continue
 
@@ -262,17 +266,28 @@ def action_masks(player_unit, unit_handles):
     # Note: `is_in_ability_phase` means it is currently doing an ability.
     if not ability_available(ability):
       # Can't use ability
-      #print("Can't use ability")
       masks['ability'][0, 0, ability.slot] = 0
 
   if not masks['ability'].any():
     # No abilities possible, so we cannot choose to use any abilities.
     masks['enum'][0, 0, 3] = 0
 
+  for item in player_unit.items:
+    if item.slot >= 3:
+      continue
+
+    # Note: `is_fully_castable` implies there is mana for it.
+    # Note: `is_in_ability_phase` means it is currently doing an ability.
+    if not item_available(item):
+      # Can't use ability
+      masks['item'][0, 0, item.slot] = 0
+
+  if not masks['item'].any():
+    # No abilities possible, so we cannot choose to use any abilities.
+    masks['enum'][0, 0, 4] = 0
+
   valid_units = unit_handles != -1
-
   valid_units[0] = 0 # The 'self' hero can never be targetted.
-
   if not valid_units.any():
     # All units invalid, so we cannot choose the high-level attack head:
     masks['enum'][0, 0, 2] = 0
@@ -290,8 +305,10 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
   action_pb.player = unit_id
   action_enum = action_dict['enum']
 
-  hero_location = hero_unit.location
+  action_enum = 3
+  action_dict['ability'] = 2
 
+  hero_location = hero_unit.location
   if action_enum == 0:
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
   elif action_enum == 1:
@@ -314,9 +331,16 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
     m.once = False
     action_pb.attackTarget.CopyFrom(m)
   elif action_enum == 3:
-    action_pb = CMsgBotWorldState.Action()
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
     action_pb.cast.abilitySlot = action_dict['ability']
+  elif action_enum == 4:
+    t = CMsgBotWorldState.Action.CastTree()
+    t.abilitySlot = action_dict['item']
+    t.tree = 50
+
+    action_pb = CMsgBotWorldState.Action()
+    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
+    action_pb.castTree.CopyFrom(t) 
   else:
     raise ValueError("unknown action {}".format(action_enum))
     action_pb.player = TEAM_RADIANT
@@ -476,6 +500,36 @@ def sample_ability_actions(logits, mask):
   return sample, masked_logits
 
 
+@tf.function
+def sample_item_actions(logits, mask):
+  class MaskedCategorical():
+    def __init__(self, log_probs, mask):
+      self.log_probs = log_probs
+
+    def sample(self):
+      return tfd.Categorical(probs=self.log_probs[-1]).sample()
+
+  def masked_softmax(logits, mask, dim=1):
+    """Returns log-probabilities."""
+    mask = tf.cast(mask, 'int32')
+    exp = tf.math.exp(logits)
+    masked_exp = exp
+    masked_exp *= tf.cast(tf.not_equal(mask, 0), 'float32')
+    masked_sumexp = tf.math.reduce_sum(masked_exp, axis=dim, keepdims=True)
+    logsumexp = tf.math.log(masked_sumexp)
+    log_probs = logits - logsumexp
+    masked_logits = logits * tf.cast(tf.not_equal(mask, 0), 'float32')
+
+    masked_log_logits = tf.keras.layers.Softmax()(masked_logits)
+
+    return masked_log_logits, tf.expand_dims(masked_logits, 0)
+
+  log_probs, masked_logits = masked_softmax(logits=logits, mask=mask)
+  sample = MaskedCategorical(log_probs=log_probs, mask=mask).sample()
+
+  return sample, masked_logits
+
+
 def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits):
   """From all heads, select actions."""
   # First select the high-level action.
@@ -498,6 +552,10 @@ def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits)
     action_dict['ability'], ability_masked_probs = sample_ability_actions(heads_logits['ability'][0], 
                                                                  action_masks['ability'][0])
     masked_heads_logits['ability'] = ability_masked_probs
+  elif action_dict['enum'] == 4:  # Ability
+    action_dict['item'], item_masked_probs = sample_ability_actions(heads_logits['item'][0], 
+                                                                    action_masks['item'][0])
+    masked_heads_logits['item'] = item_masked_probs
   else:
     ValueError("Invalid Action Selection.")
   
