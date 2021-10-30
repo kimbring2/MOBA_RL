@@ -161,7 +161,7 @@ Then add the following line to the [bot_generic.lua](https://github.com/TimZaman
 
 ```
 elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
-        action_table[action.actionType] = {{action.purchaseItem.item_name}}
+        action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.itemName}}
 ```
 
 Finally, make the purchase_item.lua file to your [actions](https://github.com/TimZaman/dotaservice/tree/master/dotaservice/lua/actions) folder and copy the following content.
