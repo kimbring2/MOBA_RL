@@ -1,7 +1,7 @@
 # MOBA_RL
 Deep Reinforcement Learning for Multiplayer Online Battle Arena
 
-- [MOBA_RL](#moba-rl)
+# Tabel of Content
 - [Prerequisite](#prerequisite)
 - [Derk Environment](#derk-environment)
 - [Dota2 Environment](#dota2-environment)
