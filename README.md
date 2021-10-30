@@ -273,8 +273,6 @@ action_pb.player = 0
 action_pb.castTree.CopyFrom(t) 
 ```
 
-The arguments such as item, item_name, tree is not actually used. Howerver, I just leave it as it was becasue it is difficult to delete.
-
 After implementing all of the above Lua scripts, hero can purchase and use Tango items like a below video.
 
 [![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
