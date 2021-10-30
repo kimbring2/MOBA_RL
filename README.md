@@ -138,6 +138,12 @@ If you search through the tmux, you can see that 16 dotaservices is ran in one t
 
 <img src="image/dota2_server_log.png " width="1000">
 
+Run below command to see Tensorboard log of training PC from rendeirng PC remotely.
+
+```
+tensorboard --host 0.0.0.0 --logdir=./tensorboard
+```
+
 ### Single Hero Training Result
 
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
