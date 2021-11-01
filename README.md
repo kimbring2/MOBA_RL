@@ -155,7 +155,7 @@ After finishing training, you need a trained model from training pc to rendering
 ```
 $ python -m dotaservice
 $ python learner_dota.py
-$ python3.7 run.py --render True
+$ python run.py --render True
 ```
 
 On the rendering PC, you can check the training result better than the graph as shown in the video below. The hero learns how to move to mid area and attack enermy creep.
