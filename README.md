@@ -11,9 +11,6 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Single Hero Training Result](#single-hero-training-result)
   * [4. Buying and using item](#4-buying-and-using-item)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
-
 # Prerequisite
 1. Python 3
 2. tmux
