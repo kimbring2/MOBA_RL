@@ -48,7 +48,7 @@ end
 
 
 local function act(action)
-    --print("dump(action): ", dump(action))
+    print("dump(action): ", dump(action))
     -- [VScript] dump(action):  { ["player"] = 0,["actionDelay"] = 328,["purchaseItem"] = { ["itemName"] = item_tango,["item"] = 2,} ,["actionType"] = DOTA_UNIT_ORDER_PURCHASE_ITEM,} 
     -- [VScript] dump(action):  { ["player"] = 0,["chat"] = { ["message"] = test,["toAllchat"] = true,} ,["actionDelay"] = 58,["actionType"] = ACTION_CHAT,} 
 
@@ -105,7 +105,7 @@ local function act(action)
     elseif action.actionType == "DOTA_UNIT_ORDER_DROP_ITEM" then
         action_table[action.actionType] = {{action.dropItem.slot}, {action.dropItem.location.x, action.dropItem.location.y, 0,0}, {0}}
     elseif action.actionType == "ACTION_COURIER" then
-        action_table[action.actionType] = {{action.courier.courier}, {action.courier.action}}
+        action_table[action.actionType] = {{action.courier.action}}
     elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
         action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.itemName}}
     end
