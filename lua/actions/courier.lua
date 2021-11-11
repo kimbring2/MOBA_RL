@@ -27,16 +27,53 @@ ActionCourier.NumArgs = 3
 -- NOTE: To move the courier you use a hUnit:MoveToLocation() as per normal unit
 --       using the handle to the courier. This function is for Courier specific API
 
-function ActionCourier:Call(hHero, iCourierIndex, iCourierAction)
-    -- NOTE: iCourierIndex is 0 indexed (based on C++) and left over
-    --       from when you could have multiple courier per team
-    local hCourier = GetCourier(iCourierIndex[1] or 0)
-    iCourierAction = iCourierAction[1]
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
 
-    if hCourier and not GetCourierState(hCourier) == COURIER_STATE_DEAD then
-        hHero:ActionImmediate_Courier(hCourier, iCourierAction)
+
+
+function ActionCourier:Call(hHero, iCourierAction)
+    print("dump(iCourierAction): ", dump(iCourierAction))
+    print("dump(GetNumCouriers()): ", dump(GetNumCouriers()))
+
+    if GetNumCouriers() == 0 then return end
+    if hHero:IsIllusion() then return end
+    local courier = nil
+    for i = 0, GetNumCouriers() do
+        local t = GetCourier(i)
+        print("dump(hHero:GetPlayerID()): ", dump(hHero:GetPlayerID()))
+        if hHero:GetPlayerID() == t:GetPlayerID() then
+        	print("hHero:GetPlayerID() == t:GetPlayerID()")
+            courier = t
+            break
+        end
+    end
+
+    if courier == nil then return end
+
+    --print("dump(courier): ", dump(courier))
+    local state = GetCourierState(courier)
+    --print("dump(state): ", dump(state))
+    --print("dump(COURIER_STATE_DEAD): ", dump(COURIER_STATE_DEAD))
+    --print("dump(courier:GetHealth()): ", dump(courier:GetHealth()))
+
+    if state == COURIER_STATE_DEAD or courier:GetHealth() < 1 then
+        return
+    else
+        hHero:ActionImmediate_Courier(courier, iCourierAction[1])
     end
 end
+
 
 -------------------------------------------------
 

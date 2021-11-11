@@ -7,9 +7,33 @@ local UseAbilityOnLocation = {}
 UseAbilityOnLocation.Name = "Use Ability On Location"
 UseAbilityOnLocation.NumArgs = 4
 
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+
 -------------------------------------------------
 function UseAbilityOnLocation:Call( hUnit, intAbilitySlot, vLoc, iType )
-    local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    local hAbility
+
+    if intAbilitySlot[1] >= 0 then
+        hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    else
+        itemSlot = -intAbilitySlot[1] - 1
+        print("dump(itemSlot): ", dump(itemSlot))
+        hAbility = hUnit:GetItemInSlot(itemSlot)
+    end
+
     if not hAbility then
         print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
         do return end
@@ -19,7 +43,7 @@ function UseAbilityOnLocation:Call( hUnit, intAbilitySlot, vLoc, iType )
 
     iType = iType[1]
 
-    -- Note: we do not test if the location can be ability-targeted due 
+    -- Note: we do not test if the location can be ability-targeted due
     -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
     -- We assume only valid and legal actions are agent selected
 

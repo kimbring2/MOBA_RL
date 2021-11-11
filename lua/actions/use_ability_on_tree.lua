@@ -7,8 +7,28 @@ local UseAbilityOnTree = {}
 UseAbilityOnTree.Name = "Use Ability On Tree"
 UseAbilityOnTree.NumArgs = 4
 
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+
 -------------------------------------------------
 function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
+    --hItem = hUnit:HasItemInInventory("item_tango")
+    local hItem_1 = hUnit:GetItemInSlot(0)
+    --local hItem_2 = hUnit:GetItemInSlot(1)
+    --local hAbility_3 = hUnit:GetAbilityInSlot(9)
+    --print("dump(hItem_1): ", dump(hItem_1))
     local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
     if not hAbility then
         print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
@@ -16,17 +36,25 @@ function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
     end
 
     intTree = intTree[1]
-
     iType = iType[1]
 
     -- Note: we do not test if the tree can be ability-targeted due to
     -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
     -- We assume only valid and legal actions are agent selected
+    local tableNearbyTrees = hUnit:GetNearbyTrees(500);
+    if tableNearbyTrees[1] then
+        intTree = tableNearbyTrees[1]
+    end
+
+    --print("dump(intTree): ", dump(intTrees))
 
     local vLoc = GetTreeLocation(intTree)
+
     DebugDrawCircle(vLoc, 25, 255, 0, 0)
     DebugDrawLine(hUnit:GetLocation(), vLoc, 255, 0, 0)
 
+    hAbility = hItem_1
+    --print("dump(hAbility): ", dump(hAbility))
     if iType == nil or iType == ABILITY_STANDARD then
         hUnit:Action_UseAbilityOnTree(hAbility, intTree)
     elseif iType == ABILITY_PUSH then
