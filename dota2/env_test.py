@@ -66,8 +66,10 @@ item_buy_flag = False
 item_use_flag = False
 move_flag = False
 tree_flag = False
-stick_flag = True
-courier_flag = False
+stick_flag = False
+courier_stash_flag = False
+courier_transfer_flag = False
+teleport_flag = True
 async def step():
   global skill_learn_flag
   global skill_use_flag
@@ -76,11 +78,15 @@ async def step():
   global move_flag
   global tree_flag
   global stick_flag
+  global courier_stash_flag
+  global courier_transfer_flag
+  global teleport_flag
 
   response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
   #print('response.world_state: ', response.world_state)
   dota_time = response.world_state.dota_time
   print('response.world_state.dota_time: ', response.world_state.dota_time)
+  #print('response.world_state.glyph_cooldown: ', response.world_state.glyph_cooldown)
 
   hero_unit = None
   enermy_hero = None
@@ -102,7 +108,7 @@ async def step():
     if unit.unit_type == CMsgBotWorldState.UnitType.Value('TOWER') \
             and unit.team_id == TEAM_RADIANT and 'tower1_mid' in unit.name:
             mid_tower = unit
-            
+  
   mid_tower_location = mid_tower.location
   #print("mid_tower_location: ", mid_tower_location)
 
@@ -111,21 +117,37 @@ async def step():
   hero_location = hero_unit.location
   hero_item = hero_unit.items
   print("hero_location: ", hero_location)
-  #print("hero_item: ", hero_item)
+  #print("hero_unit.name: ", hero_unit.name)
+  #print("hero_unit.is_alive: ", hero_unit.is_alive)
+  #print("hero_unit.team_id: ", hero_unit.team_id)
   '''
   for ability in hero_unit.abilities:
+    #print("ability: ", ability)
     print("ability.ability_id: ", ability.ability_id)
+    print("ability.slot: ", ability.slot)
     print("ability.is_activated: ", ability.is_activated)
     print("ability.level: ", ability.level)
     print("ability.cooldown_remaining: ", ability.cooldown_remaining)
+    print("")
   '''
+  
+  #print("hero_unit.action_type: ", hero_unit.action_type)
+  #print("hero_unit.anim_activity: ", hero_unit.anim_activity)
+  #print("hero_unit.health_max: ", hero_unit.health_max)
+  #print("hero_unit.xp_needed_to_level: ", hero_unit.xp_needed_to_level)
+  #print("hero_unit.reliable_gold: ", hero_unit.reliable_gold)
+  #print("hero_unit.unreliable_gold: ", hero_unit.unreliable_gold)
+  #print("hero_unit.location: ", hero_unit.location)
+  #print("hero_unit.facing: ", hero_unit.facing)
+
+  #print("hero_item: ", hero_item)
 
   for item in hero_unit.items:
     #print("item: ", item)
-    #print("item.ability_id: ", item.ability_id)
-    #print("item.is_activated: ", item.is_activated)
-    #print("item.slot: ", item.slot)
-    #print("item.cooldown_remaining: ", item.cooldown_remaining)
+    print("item.ability_id: ", item.ability_id)
+    print("item.is_activated: ", item.is_activated)
+    print("item.slot: ", item.slot)
+    print("item.cooldown_remaining: ", item.cooldown_remaining)
 
     if item.ability_id == 34:
       if item.is_activated == True:
@@ -140,9 +162,11 @@ async def step():
     move_flag = True
     #courier_flag = True
   else:
-    #item_use_flag = True
-    #courier_flag = True
-    item_buy_flag = True
+    if courier_stash_flag == False and courier_transfer_flag == False:
+      #item_use_flag = True
+      #courier_flag = True
+      #item_buy_flag = True
+      teleport_flag = True
 
   m = CMsgBotWorldState.Action.MoveToLocation()
   m.location.x = mid_tower_location.x + 600
@@ -162,13 +186,15 @@ async def step():
   t.abilitySlot = 0
   t.tree = 50
 
-  print("item_buy_flag: ", item_buy_flag)
-  print("item_use_flag: ", item_use_flag)
-  print("tree_flag: ", tree_flag)
-  print("stick_flag: ", stick_flag)
-  print("skill_learn_flag: ", skill_learn_flag)
-  print("move_flag: ", move_flag)
-  print("skill_use_flag: ", skill_use_flag)
+  #print("item_buy_flag: ", item_buy_flag)
+  #print("item_use_flag: ", item_use_flag)
+  #print("tree_flag: ", tree_flag)
+  #print("stick_flag: ", stick_flag)
+  #print("skill_learn_flag: ", skill_learn_flag)
+  #print("move_flag: ", move_flag)
+  #print("skill_use_flag: ", skill_use_flag)
+  #print("courier_stash_flag: ", courier_stash_flag)
+  print("teleport_flag: ", teleport_flag)
 
   #action_pb.chat.CopyFrom(t) 
   action_pb = CMsgBotWorldState.Action()
@@ -177,8 +203,8 @@ async def step():
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
       action_pb.player = 0
       action_pb.purchaseItem.CopyFrom(i) 
-      #item_buy_flag = False
-      courier_flag = True
+      item_buy_flag = False
+      courier_stash_flag = True
     elif item_use_flag == True:
       if tree_flag == True:
         action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
@@ -213,7 +239,7 @@ async def step():
       action_pb.cast.abilitySlot = 2
       #action_pb.castTarget.target = enermy_hero.handle
       skill_use_flag = False
-    elif courier_flag == True:
+    elif courier_stash_flag == True:
       action_pb.actionDelay = 0 
       action_pb.player = 0 
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
@@ -221,8 +247,26 @@ async def step():
       action_pb.courier.unit = 0 
       action_pb.courier.courier = 0
       action_pb.courier.action = 3
-      courier_flag = False
-      item_buy_flag = True
+      courier_stash_flag = False
+      courier_transfer_flag = True
+    elif courier_transfer_flag == True:
+      action_pb.actionDelay = 0 
+      action_pb.player = 0 
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
+
+      action_pb.courier.unit = 0 
+      action_pb.courier.courier = 0
+      action_pb.courier.action = 6
+      #courier_transfer_flag = False
+    elif teleport_flag == True and dota_time > 20.0:
+      action_pb.actionDelay = 0 
+      action_pb.player = 0 
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+
+      action_pb.castLocation.abilitySlot = -16
+      action_pb.castLocation.location.x = -6700
+      action_pb.castLocation.location.y = -6700
+      action_pb.castLocation.location.z = 0
     else:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
   else:
