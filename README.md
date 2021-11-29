@@ -295,10 +295,19 @@ After implementing all of the above Lua scripts, hero can purchase and use Tango
 <strong>Click to Watch!</strong>
 
 ## 5. Learning and using ability
-Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. I will explain how to write Lua script for that because the dotaservice lacks this part.
+Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. Furthermore, the method of selecting the target for each ability is slightly different. Target can be nothing, unit, and tree.
 
 <img src="image/shadowraze_description.png" width="300">
 
-[![Dota2 Shadowraze ability demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
+The Shadowraze does not require the target. Therefore, we need to write the code as follows.
+
+```
+action_pb = CMsgBotWorldState.Action()
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+action_pb.player = 0
+```
+
+It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
+
+[![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
-https://www.youtube.com/watch?v=OVScU7aLEpk
