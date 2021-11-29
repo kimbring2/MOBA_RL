@@ -165,7 +165,7 @@ Unlike the Derk game, where items are given at the start, the hero of Dota2 must
 
 The Tango that is most basic item can be purchased at the store when start of game. Hero can use it on the surrounding trees to regenerate the health. Let's see how to write a code this item.
 
-<img src="image/tango_description.jpg " width="300">
+<img src="image/tango_description.png" width="300">
 
 To add the ability to purchase and use items, you must first add a below code line to the [action_processor.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/action_processor.lua) of dotaservice.
 
