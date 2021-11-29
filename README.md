@@ -10,6 +10,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [3. Training Environment](#3-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
   * [4. Buying and using item](#4-buying-and-using-item)
+  * [5. Learning and using ability](#5-learning-and-using-ability)
 
 # Prerequisite
 1. Python 3
@@ -142,7 +143,6 @@ tensorboard --host 0.0.0.0 --logdir=./tensorboard
 ```
 
 ### Single Hero Training Result
-
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
 <img src="image/dota2_single_reward.png " width="300">
@@ -293,3 +293,12 @@ After implementing all of the above Lua scripts, hero can purchase and use Tango
 
 [![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
+
+## 5. Learning and using ability
+Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. I will explain how to write Lua script for that because the dotaservice lacks this part.
+
+<img src="image/shadowraze_description.jpg " width="300">
+
+[![Dota2 Shadowraze ability demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
+<strong>Click to Watch!</strong>
+https://www.youtube.com/watch?v=OVScU7aLEpk
