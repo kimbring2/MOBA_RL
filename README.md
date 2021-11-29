@@ -297,7 +297,7 @@ After implementing all of the above Lua scripts, hero can purchase and use Tango
 ## 5. Learning and using ability
 Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
-<img src="image/shadowraze_description.jpg " width="300">
+<img src="image/shadowraze_description.png" width="300">
 
 [![Dota2 Shadowraze ability demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
