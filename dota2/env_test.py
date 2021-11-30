@@ -105,18 +105,13 @@ def cal_distance(p1, p2):
     return np.sqrt(np.power(p1.x - p2.x, 2) + np.power(p1.y - p2.y, 2))
 
 
-def get_item_number(unit, courier, item_id):
+def get_item_number(unit, item_id):
   res = 0
   items = unit.items
 
   for item in items:
     if item.ability_id == item_id:
         res += item.charges
-
-  items = courier.items
-  for item in items:
-    if item.ability_id == item_id:
-      res += item.charges
 
   return res
 
@@ -151,11 +146,6 @@ def in_facing_distance(hero, u, distance, r=250, normalization=False):
         return 0
 
 
-init_item = [
-              'item_enchanted_mango', 'item_flask', 'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_enchanted_mango',
-              'item_enchanted_mango', 'item_enchanted_mango'
-            ]
-
 ITEM_BRANCH_ID = 16
 ITEM_CLARITY_ID = 38
 ITEM_FLASK_ID = 39
@@ -171,8 +161,65 @@ ITEM_CIRCLET = 20
 ITEM_BRACER = 73
 ITEM_WRAITH = 75
 ITEM_LESSER_CRIT = 149
-ITEM_WARD_DISPENSER_ID = 218 # 叠加在一起的真假眼
+ITEM_WARD_DISPENSER_ID = 218
 ITEM_BOOTS = 29
+
+ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_FLASK_ID, ITEM_BOTTLE_ID, ITEM_WARD_ID, ITEM_WARD_SENTRY_ID,
+                ITEM_TANGO_ID, ITEM_MANGO_ID, ITEM_FAERIE_FIRE_ID, ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID,
+                ITEM_CIRCLET, ITEM_BRACER, ITEM_WRAITH, ITEM_LESSER_CRIT, ITEM_WARD_DISPENSER_ID, ITEM_BOOTS]
+def get_item_matrix(unit):
+  item_dict = {
+    ITEM_BRANCH_ID : 0,
+    ITEM_CLARITY_ID : 1,
+    ITEM_FLASK_ID : 2,
+    ITEM_BOTTLE_ID : 3,
+    ITEM_WARD_ID : 4,
+    ITEM_WARD_SENTRY_ID : 5,
+    ITEM_TANGO_ID : 6,
+    ITEM_MANGO_ID : 7,
+    ITEM_FAERIE_FIRE_ID : 8,
+    ITEM_MAGIC_STICK_ID : 9,
+    ITEM_MAGIC_WAND_ID : 10,
+    ITEM_CIRCLET : 11,
+    ITEM_BRACER : 12,
+    ITEM_WRAITH : 13,
+    ITEM_LESSER_CRIT : 14,
+    ITEM_WARD_DISPENSER_ID : 15,
+    ITEM_BOOTS : 16
+  }
+
+  item_matrix = np.zeros(len(item_dict))
+  for item_id in ITEM_ID_LIST:
+    item_num = get_item_number(unit, item_id)
+    item_matrix[item_dict[item_id]] = item_num
+
+  return item_matrix
+
+
+init_item = [
+              'item_flask', 'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_enchanted_mango',
+              'item_enchanted_mango', 'item_enchanted_mango'
+            ]
+
+modifier_name = {
+        "modifier_nevermore_necromastery": 1,
+        "modifier_nevermore_shadowraze_debuff": 2,
+        "modifier_flask_healing": 3,
+        "modifier_nevermore_requiem_fear": 4,
+        "modifier_tango_heal": 5,
+        "modifier_item_faerie_fire": 6,
+        "modifier_item_enchanted_mango": 7,
+        "modifier_fountain_aura_buff": 8,
+        "modifier_tower_aura_bonus": 9
+    }
+
+routes = [
+        'nevermore_necromastery', 'nevermore_shadowraze1', 'nevermore_shadowraze1', 'nevermore_necromastery',
+        'nevermore_shadowraze1', 'nevermore_necromastery', 'nevermore_shadowraze1', 'nevermore_necromastery',
+        'nevermore_dark_lord', 'special_bonus_spell_amplify_8', 'nevermore_requiem', 'nevermore_dark_lord',
+        'nevermore_dark_lord', 'nevermore_dark_lord', 'special_bonus_unique_nevermore_3', 'nevermore_requiem',
+        'nevermore_requiem', 'special_bonus_unique_nevermore_1', 'special_bonus_unique_nevermore_5'
+    ]
 
 blank_slots = [0, 1, 2, 3, 4, 5]
 
@@ -209,6 +256,8 @@ async def step():
   enemey_creep_min = None
   self_creep_min_distance = 9999
   enemey_creep_min_distance = 9999
+
+  current_items = {}
 
   response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
   #print('response.world_state: ', response.world_state)
@@ -251,8 +300,12 @@ async def step():
   #print("self_tower_position: ", self_tower_position)
   #print("enemy_tower_position: ", enemy_tower_position)
   
-  hero_modifier = hero_unit.modifiers
-  print("hero_modifier: ", hero_modifier)
+  hero_modifiers = hero_unit.modifiers
+  #print("hero_modifiers: ", hero_modifiers)
+  for hero_modifier in hero_modifiers:
+    #print("hero_modifier.name: ", hero_modifier.name)
+    hero_modifier_index = modifier_name[hero_modifier.name]
+    print("hero_modifier_index: ", hero_modifier_index)
 
   dis_2tower = cal_distance(hero_unit.location, self_tower.location)
   #print("dis_2tower: ", dis_2tower)
@@ -280,13 +333,13 @@ async def step():
           enemey_creep_min = unit
           enemey_creep_min_distance = dist
 
-  flask_item_num = get_item_number(hero_unit, hero_courier, ITEM_FLASK_ID)
+  flask_item_num = get_item_number(hero_unit, ITEM_FLASK_ID)
   #print("flask_item_num: ", flask_item_num)
 
-  mango_item_num = get_item_number(hero_unit, hero_courier, ITEM_MANGO_ID)
+  mango_item_num = get_item_number(hero_unit, ITEM_MANGO_ID)
   #print("mango_item_num: ", mango_item_num)
 
-  faerie_fire_item_num = get_item_number(hero_unit, hero_courier, ITEM_FAERIE_FIRE_ID)
+  faerie_fire_item_num = get_item_number(hero_unit, ITEM_FAERIE_FIRE_ID)
   #print("faerie_fire_item_num: ", faerie_fire_item_num)
 
   flask_item_slot = get_item_slot(hero_unit, ITEM_FLASK_ID)
@@ -299,24 +352,28 @@ async def step():
   #print("mango_item_slot: ", mango_item_slot)
 
   faerie_fire_item_slot = get_item_slot(hero_unit, ITEM_FAERIE_FIRE_ID)
-  print("faerie_fire_item_slot: ", faerie_fire_item_slot)
+  #print("faerie_fire_item_slot: ", faerie_fire_item_slot)
+
+  item_matrix = get_item_matrix(hero_unit)
+  print("item_matrix: ", item_matrix)
 
   if faerie_fire_item_num != 0:
-    item_use_flag = True
-    faerie_fire_flag = True
+    #item_use_flag = True
+    #faerie_fire_flag = True
+    pass
   #  pass
   #if mango_item_num != 0:
   #  item_use_flag = True
   #  mango_flag = True
 
-  #print("hero_location: ", hero_location)
+  print("hero_location: ", hero_location)
   #print("enemey_creep_min_distance: ", enemey_creep_min_distance)
   #if enemey_creep_min_distance < 2000:
   #  skill_use_flag = True
 
   if enermy_hero != None:
     enemey_hero_distance = in_facing_distance(enermy_hero, hero_unit, 750, r=250, normalization=False)
-    print("enemey_hero_distance: ", enemey_hero_distance)
+    #print("enemey_hero_distance: ", enemey_hero_distance)
 
     if enemey_hero_distance == 1:
       skill_use_flag = True
@@ -379,7 +436,7 @@ async def step():
 
   if (abs(self_tower.location.x + 600 - hero_location.x) >= 500) or (abs(self_tower.location.y + 600 - hero_location.y) >= 500):
     if item_buy_flag == False:
-      #move_flag = True
+      move_flag = True
       #courier_flag = True
       pass
   else:
@@ -417,7 +474,7 @@ async def step():
   #print("item_buy_flag: ", item_buy_flag)
   #print("item_use_flag: ", item_use_flag)
   #print("tree_flag: ", tree_flag)
-  print("mango_flag: ", mango_flag)
+  #print("mango_flag: ", mango_flag)
   #print("stick_flag: ", stick_flag)
   #print("skill_learn_flag: ", skill_learn_flag)
   #print("move_flag: ", move_flag)
