@@ -128,6 +128,45 @@ def get_item_slot(unit, item_id, in_equipment=False):
   return None
 
 
+def get_item_type(unit, item_slot):
+  # 
+  item_dict = {
+    ITEM_FLASK_ID : 2,
+    ITEM_FAERIE_FIRE_ID : 8,
+    ITEM_TANGO_ID : 6,
+    ITEM_MANGO_ID : 7,
+    ITEM_CLARITY_ID : 1,
+    ITEM_BRANCH_ID : 0,
+    ITEM_BOTTLE_ID : 3,
+    ITEM_WARD_ID : 4,
+    ITEM_WARD_SENTRY_ID : 5,
+    ITEM_MAGIC_STICK_ID : 9,
+    ITEM_MAGIC_WAND_ID : 10,
+    ITEM_CIRCLET : 11,
+    ITEM_BRACER : 12,
+    ITEM_WRAITH : 13,
+    ITEM_LESSER_CRIT : 14,
+    ITEM_WARD_DISPENSER_ID : 15,
+    ITEM_BOOTS : 16
+  }
+
+  items = unit.items
+  for item in items:
+    if item.slot == item_slot:
+      return item.slot
+
+  return None
+
+
+def get_ability_level(unit, ability_id):
+  abilities = unit.abilities
+  for ability in abilities:
+    if ability.ability_id == ability_id: # and item['slot'] <= 5:
+      return ability.level
+
+  return None
+
+
 def in_facing_distance(hero, u, distance, r=250, normalization=False):
     x = math.cos(math.radians(hero.facing)) * distance + \
         hero.location.x
@@ -160,13 +199,12 @@ ITEM_MAGIC_WAND_ID = 36
 ITEM_CIRCLET = 20
 ITEM_BRACER = 73
 ITEM_WRAITH = 75
-ITEM_LESSER_CRIT = 149
 ITEM_WARD_DISPENSER_ID = 218
 ITEM_BOOTS = 29
 
 ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_FLASK_ID, ITEM_BOTTLE_ID, ITEM_WARD_ID, ITEM_WARD_SENTRY_ID,
                 ITEM_TANGO_ID, ITEM_MANGO_ID, ITEM_FAERIE_FIRE_ID, ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID,
-                ITEM_CIRCLET, ITEM_BRACER, ITEM_WRAITH, ITEM_LESSER_CRIT, ITEM_WARD_DISPENSER_ID, ITEM_BOOTS]
+                ITEM_CIRCLET, ITEM_BRACER, ITEM_WRAITH, ITEM_WARD_DISPENSER_ID, ITEM_BOOTS]
 def get_item_matrix(unit):
   item_dict = {
     ITEM_BRANCH_ID : 0,
@@ -183,9 +221,8 @@ def get_item_matrix(unit):
     ITEM_CIRCLET : 11,
     ITEM_BRACER : 12,
     ITEM_WRAITH : 13,
-    ITEM_LESSER_CRIT : 14,
-    ITEM_WARD_DISPENSER_ID : 15,
-    ITEM_BOOTS : 16
+    ITEM_WARD_DISPENSER_ID : 14,
+    ITEM_BOOTS : 15
   }
 
   item_matrix = np.zeros(len(item_dict))
@@ -196,8 +233,42 @@ def get_item_matrix(unit):
   return item_matrix
 
 
+ABILITY_SHADOWRAZE1_ID = 5059
+ABILITY_SHADOWRAZE2_ID = 5060
+ABILITY_SHADOWRAZE3_ID = 5061
+ABILITY_NECROMASTERY_ID = 5062
+ABILITY_DARKLOAD_ID = 5063
+ABILITY_REQUIEM_ID = 5064
+
+ABILITY_ID_LIST = [ABILITY_SHADOWRAZE1_ID, ABILITY_SHADOWRAZE2_ID, ABILITY_SHADOWRAZE3_ID, ABILITY_NECROMASTERY_ID,
+                   ABILITY_DARKLOAD_ID, ABILITY_REQUIEM_ID]
+def get_ability_matrix(unit):
+  # 0 : No Target
+  # 1 : Passive
+  # 2 : Aura
+  # 3 : Etc
+  ability_dict = {
+    ABILITY_SHADOWRAZE1_ID : 0,
+    ABILITY_SHADOWRAZE2_ID : 1,
+    ABILITY_SHADOWRAZE3_ID : 2,
+    ABILITY_NECROMASTERY_ID : 3,
+    ABILITY_DARKLOAD_ID : 4,
+    ABILITY_REQUIEM_ID : 5
+  }
+
+  ability_matrix = np.zeros(len(ability_dict))
+  for ability_id in ABILITY_ID_LIST:
+    ability_level = get_ability_level(unit, ability_id)
+    ability_matrix[ability_dict[ability_id]] = ability_level
+
+  return ability_matrix
+
+
+# 'magic_wand': ['item_branches', 'item_branches', 'item_recipe_magic_wand']
+# 'bracer': ['item_circlet', 'item_gauntlets', 'item_recipe_bracer']
+# 'wraith_band': ['item_circlet', 'item_slippers', 'item_recipe_wraith_band']
 init_item = [
-              'item_flask', 'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_enchanted_mango',
+              'item_circlet', 'item_slippers', 'item_recipe_wraith_band', 'item_enchanted_mango', 'item_enchanted_mango',
               'item_enchanted_mango', 'item_enchanted_mango'
             ]
 
@@ -210,7 +281,11 @@ modifier_name = {
         "modifier_item_faerie_fire": 6,
         "modifier_item_enchanted_mango": 7,
         "modifier_fountain_aura_buff": 8,
-        "modifier_tower_aura_bonus": 9
+        "modifier_tower_aura_bonus": 9,
+        "modifier_item_ironwood_branch": 10,
+        "modifier_item_circlet": 11,
+        "modifier_item_slippers": 12,
+        "modifier_item_wraith_band": 13
     }
 
 routes = [
@@ -226,13 +301,15 @@ blank_slots = [0, 1, 2, 3, 4, 5]
 skill_learn_flag = True
 skill_use_flag = False
 item_buy_flag = 0
-item_use_flag = False
+item_use_flag = True
 move_flag = False
 tree_flag = False
 mango_flag = False
 ward_flag = False
 stick_flag = False
 faerie_fire_flag = False
+flask_flag = True
+branches_flag = False
 courier_stash_flag = False
 courier_transfer_flag = False
 teleport_flag = False
@@ -247,6 +324,8 @@ async def step():
   global ward_flag
   global stick_flag
   global faerie_fire_flag
+  global branches_flag
+  global flask_flag
   global courier_stash_flag
   global courier_transfer_flag
   global teleport_flag
@@ -305,7 +384,7 @@ async def step():
   for hero_modifier in hero_modifiers:
     #print("hero_modifier.name: ", hero_modifier.name)
     hero_modifier_index = modifier_name[hero_modifier.name]
-    print("hero_modifier_index: ", hero_modifier_index)
+    #print("hero_modifier_index: ", hero_modifier_index)
 
   dis_2tower = cal_distance(hero_unit.location, self_tower.location)
   #print("dis_2tower: ", dis_2tower)
@@ -334,7 +413,7 @@ async def step():
           enemey_creep_min_distance = dist
 
   flask_item_num = get_item_number(hero_unit, ITEM_FLASK_ID)
-  #print("flask_item_num: ", flask_item_num)
+  print("flask_item_num: ", flask_item_num)
 
   mango_item_num = get_item_number(hero_unit, ITEM_MANGO_ID)
   #print("mango_item_num: ", mango_item_num)
@@ -343,19 +422,25 @@ async def step():
   #print("faerie_fire_item_num: ", faerie_fire_item_num)
 
   flask_item_slot = get_item_slot(hero_unit, ITEM_FLASK_ID)
-  #print("flask_item_slot: ", flask_item_slot)
+  print("flask_item_slot: ", flask_item_slot)
 
   mango_item_slot = get_item_slot(hero_unit, ITEM_MANGO_ID)
   #print("mango_item_slot: ", mango_item_slot)
 
-  #mango_item_slot = get_item_slot(self_tower, ITEM_MANGO_ID)
-  #print("mango_item_slot: ", mango_item_slot)
+  branches_item_slot = get_item_slot(hero_unit, ITEM_BRANCH_ID)
+  #print("branches_item_slot: ", branches_item_slot)
+
+  bottle_item_slot = get_item_slot(hero_unit, ITEM_BOTTLE_ID)
+  #print("bottle_item_slot: ", bottle_item_slot)
 
   faerie_fire_item_slot = get_item_slot(hero_unit, ITEM_FAERIE_FIRE_ID)
   #print("faerie_fire_item_slot: ", faerie_fire_item_slot)
 
   item_matrix = get_item_matrix(hero_unit)
-  print("item_matrix: ", item_matrix)
+  #print("item_matrix: ", item_matrix)
+
+  ability_matrix = get_ability_matrix(hero_unit)
+  #print("ability_matrix: ", ability_matrix)
 
   if faerie_fire_item_num != 0:
     #item_use_flag = True
@@ -383,16 +468,20 @@ async def step():
   #print("hero_unit.name: ", hero_unit.name)
   #print("hero_unit.is_alive: ", hero_unit.is_alive)
   #print("hero_unit.team_id: ", hero_unit.team_id)
-  '''
+  
   for ability in hero_unit.abilities:
+    #ability_name_type = get_ability_name_type(ability)
+    #print("ability_name_type: ", ability_name_type)
+
     #print("ability: ", ability)
-    print("ability.ability_id: ", ability.ability_id)
-    print("ability.slot: ", ability.slot)
-    print("ability.is_activated: ", ability.is_activated)
-    print("ability.level: ", ability.level)
-    print("ability.cooldown_remaining: ", ability.cooldown_remaining)
-    print("")
-  '''
+    #print("ability.ability_id: ", ability.ability_id)
+    #print("ability.slot: ", ability.slot)
+    #print("ability.is_activated: ", ability.is_activated)
+    #print("ability.level: ", ability.level)
+    #print("ability.cooldown_remaining: ", ability.cooldown_remaining)
+    #print("")
+    pass
+  
   
   #print("hero_unit.action_type: ", hero_unit.action_type)
   #print("hero_unit.anim_activity: ", hero_unit.anim_activity)
@@ -471,7 +560,7 @@ async def step():
   t.abilitySlot = 0
   t.tree = 50
 
-  #print("item_buy_flag: ", item_buy_flag)
+  print("item_buy_flag: ", item_buy_flag)
   #print("item_use_flag: ", item_use_flag)
   #print("tree_flag: ", tree_flag)
   #print("mango_flag: ", mango_flag)
@@ -508,6 +597,7 @@ async def step():
         action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
         action_pb.player = 0 
         #print("mango_item_slot: ", mango_item_slot)
+        #action_pb.cast.abilitySlot = -(mango_item_slot+1)
         action_pb.cast.abilitySlot = -(mango_item_slot+1)
         mango_flag = False
       elif ward_flag == True:
@@ -523,6 +613,23 @@ async def step():
         action_pb.player = 0 
         action_pb.cast.abilitySlot = -(faerie_fire_item_slot+1)
         faerie_fire_flag = False
+      elif flask_flag == True:
+        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+        action_pb.player = 0 
+        action_pb.castLocation.abilitySlot = -(flask_item_slot+1)
+        action_pb.castLocation.location.x = hero_unit.location.x
+        action_pb.castLocation.location.y = hero_unit.location.y
+        action_pb.castLocation.location.z = 0
+        flask_flag = False
+      elif branches_flag == True:
+        # {{action.castLocation.abilitySlot}, {action.castLocation.location.x, action.castLocation.location.y, 0.0}, {0}}
+        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+        action_pb.player = 0 
+        action_pb.castLocation.abilitySlot = -(branches_item_slot+1)
+        action_pb.castLocation.location.x = hero_unit.location.x + 300
+        action_pb.castLocation.location.y = hero_unit.location.y + 900
+        action_pb.castLocation.location.z = 0
+        branches_flag = False
       else:
         action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     elif skill_learn_flag == True:
