@@ -108,6 +108,8 @@ local function act(action)
         action_table[action.actionType] = {{action.courier.action}}
     elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
         action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.itemName}}
+    elseif action.actionType == "ACTION_SWAP_ITEMS" then
+        action_table[action.actionType] = {{action.swapItems.slotA}, {action.swapItems.slotB}}
     end
     action_proc:Run(GetBot(), action_table)
 end

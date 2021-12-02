@@ -33,6 +33,8 @@ local actionCourier             = require( "bots/actions/courier" )
 
 local purchaseItem              = require( "bots/actions/purchase_item" )
 
+local actionSwapItems           = require( "bots/actions/swap_item" )
+
 -- Global Variables
 ABILITY_STANDARD = 0
 ABILITY_PUSH     = 1
@@ -60,6 +62,7 @@ LookUpTable = {
     ['DOTA_UNIT_ORDER_DROP_ITEM'] = actionDropItem,
     ['ACTION_COURIER'] = actionCourier,
     ['DOTA_UNIT_ORDER_PURCHASE_ITEM'] = purchaseItem,
+    ['ACTION_SWAP_ITEMS'] = actionSwapItems
 }
 
 local function table_length(tbl)
