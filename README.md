@@ -320,7 +320,7 @@ Unlike the Derk game, where item are not changed until end of game, the hero of 
 
 For example, in the case of the Magic Stick, which is a very early game, it can be upgraded to the Magic Wand by using 2 Iron Branch and 1 Recipe like a below image.
 
-<img src="image/dota2_magic_wand.png" width="750">
+<img src="image/dota2_magic_wand.png" width="600">
 
 When implementing that as Python code, you can just save the item name in the list and use that as sequently for purchasing each item.
 
