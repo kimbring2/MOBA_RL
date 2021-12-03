@@ -351,8 +351,7 @@ The video below shows how to use the above code to acquire a magic wand.
 ## 7. Using Town Portar Scroll
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero should use the Town Portal scroll to join and exit from battle. 
 
-[![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
-<strong>Click to Watch!</strong>
+<img src="image/dota2_tp_scrool.png" width="750">
 
 In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. The Python code for using it is like below.
 
@@ -367,8 +366,14 @@ action_pb.castLocation.location.y = -6700
 action_pb.castLocation.location.z = 0
 ```
 
+[![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
+
 ## 8. Using the Courier
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero of battle point can use the Courier to obtain the items without moving to starting point.
+
+<img src="image/dota2_courier.png" width="750">
 
 If hero purchase an item when there is no store around, that item in stored under stash. Below Python code is for transfering that items to the Courier.
 
