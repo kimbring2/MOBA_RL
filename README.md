@@ -292,7 +292,7 @@ action_pb.castTree.CopyFrom(t)
 
 After implementing all of the above Lua scripts, hero can purchase and use Tango items like a below video.
 
-[![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 single hero training video - Click to Watch!")
+[![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 Tango item video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
 ## 5. Learning and using ability
@@ -310,10 +310,39 @@ action_pb.player = 0
 
 It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
 
-[![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 single hero training video - Click to Watch!")
+[![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 Shadowraze ability video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
 ## 6. Upgrading item
-Unlike the Derk game, where item are not changed until end of game, the hero of Dota2 can upgrade low level items to high level one by using recipe system
+Unlike the Derk game, where item are not changed until end of game, the hero of Dota2 can upgrade low level items to high level one by using recipe system.
 
-<img src="image/dota2_magic_wand.png" width="500">
+For example, in the case of the Magic Stick, which is a very early game, it can be upgraded to the Magic Wand by using 2 Iron Branch and 1 Recipe like a below image.
+
+<img src="image/dota2_magic_wand.png" width="750">
+
+When implementing that as Python code, you can just save the item name in the list and use that as sequently for purchasing each item.
+
+```
+item_buy_flag = 0
+
+init_item = [
+              'item_magic_stick', 'item_branches', 'item_branches', 'item_recipe_magic_wand'
+            ]  
+	    
+if item_buy_flag != len(init_item):
+  action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
+  action_pb.player = 0
+
+  i = CMsgBotWorldState.Action.PurchaseItem()
+  i.item = 2
+  i.item_name = init_item[item_buy_flag]
+
+  action_pb.purchaseItem.CopyFrom(i) 
+  item_buy_flag += 1
+```
+
+The video below shows how to use the above code to acquire a magic wand.
+
+[![Dota2 upgrade item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
