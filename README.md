@@ -11,6 +11,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Single Hero Training Result](#single-hero-training-result)
   * [4. Buying and using item](#4-buying-and-using-item)
   * [5. Learning and using ability](#5-learning-and-using-ability)
+  * [6. Upgrading item](#6-upgrading-item)
 
 # Prerequisite
 1. Python 3
@@ -311,3 +312,8 @@ It would best to use that ability when an enemy hero or creep is within range of
 
 [![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
+
+## 6. Upgrading item
+Unlike the Derk game, where item are not changed until end of game, the hero of Dota2 can upgrade low level items to high level one by using recipe system
+
+<img src="image/dota2_magic_wand.png" width="500">
