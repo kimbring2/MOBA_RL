@@ -367,7 +367,7 @@ action_pb.castLocation.location.y = -6700
 action_pb.castLocation.location.z = 0
 ```
 
-## 7. Using the Courier
+## 8. Using the Courier
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero can use the Courier to join and exit from battle. 
 
 If hero purchase an item when there is no store around, that item in stored under stash. Below Python code is for transfering that items to the Courier.
