@@ -12,6 +12,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [4. Buying and using item](#4-buying-and-using-item)
   * [5. Learning and using ability](#5-learning-and-using-ability)
   * [6. Upgrading item](#6-upgrading-item)
+  * [7. Using Town Portar Scroll](#6-using-town-portar-scroll)
 
 # Prerequisite
 1. Python 3
@@ -343,6 +344,54 @@ if item_buy_flag != len(init_item):
 
 The video below shows how to use the above code to acquire a magic wand.
 
-[![Dota2 upgrade item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
+[![Dota2 upgrade item demo](https://img.youtube.com/vi/EbCzKKf4aao/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
+## 7. Using Town Portar Scroll
+Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero should use the Town Portal scroll to join and exit from battle. 
+
+[![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
+In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. The Python code for using it is like below.
+
+```
+action_pb.actionDelay = 0 
+action_pb.player = 0 
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+
+action_pb.castLocation.abilitySlot = -16
+action_pb.castLocation.location.x = -6700
+action_pb.castLocation.location.y = -6700
+action_pb.castLocation.location.z = 0
+```
+
+## 7. Using the Courier
+Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero can use the Courier to join and exit from battle. 
+
+If hero purchase an item when there is no store around, that item in stored under stash. Below Python code is for transfering that items to the Courier.
+
+```
+action_pb.player = 0 
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
+
+action_pb.courier.unit = 0 
+action_pb.courier.courier = 0
+action_pb.courier.action = 6
+```
+
+After taking the stash items, Courier can give them to hero by using below Python code:
+
+```
+action_pb.player = 0 
+action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
+
+action_pb.courier.unit = 0 
+action_pb.courier.courier = 0
+action_pb.courier.action = 3
+```
+
+Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
+
+[![Dota2 use courier](https://img.youtube.com/vi/xSvZRYFXErg/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use courier video - Click to Watch!")
+<strong>Click to Watch!</strong>
