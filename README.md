@@ -10,8 +10,9 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [3. Training Environment](#3-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
   * [4. Ability and Item](#4-ability-and-item)
-    + [Learning and using ability](#learning-and-using-ability)
-    + [Upgrading item](#upgrading-item)
+    + [Buying and Using Item](#buying-and-using-item)
+    + [Learning and Using Ability](#learning-and-using-ability)
+    + [Upgrading Item](#upgrading-item)
     + [Using Town Portar Scroll](#using-town-portar-scroll)
     + [Using the Courier](#using-the-courier)
 
@@ -164,6 +165,10 @@ On the rendering PC, you can check the training result better than the graph as 
 <strong>Click to Watch!</strong>
 
 ## 4. Ability and Item
+
+
+
+### Buying and Using Item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
 The Tango that is most basic item can be purchased at the store when start of game. Hero can use it on the surrounding trees to regenerate the health. Let's see how to write a code this item.
