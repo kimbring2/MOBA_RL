@@ -3,6 +3,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 
 # Tabel of Content
 - [Prerequisite](#prerequisite)
+- [Reference](#reference)
 - [Derk Environment](#derk-environment)
 - [Dota2 Environment](#dota2-environment)
   * [1. Network Architecture](#1-network-architecture)
@@ -28,9 +29,11 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 9. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
 
 # Reference
-1. Dotaservice: https://github.com/TimZaman/dotaservice
-2. Dotaclient: https://github.com/TimZaman/dotaclient
-3. LastOrder-Dota2: https://github.com/bilibili/LastOrder-Dota2
+1. Seed RL: https://github.com/google-research/seed_rl
+2. Derk's Gym: https://gym.derkgame.com/ 
+3. Dotaservice: https://github.com/TimZaman/dotaservice
+4. Dotaclient: https://github.com/TimZaman/dotaclient
+5. LastOrder-Dota2: https://github.com/bilibili/LastOrder-Dota2
 
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
