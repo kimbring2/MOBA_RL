@@ -9,11 +9,11 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [2. Rendering Environment](#2-rendering-environment)
   * [3. Training Environment](#3-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
-  * [4. Buying and using item](#4-buying-and-using-item)
-  * [5. Learning and using ability](#5-learning-and-using-ability)
-  * [6. Upgrading item](#6-upgrading-item)
-  * [7. Using Town Portar Scroll](#7-using-town-portar-scroll)
-  * [8. Using the Courier](#8-using-the-courier)
+  * [4. Ability and Item](#4-ability-and-item)
+    + [Learning and using ability](#learning-and-using-ability)
+    + [Upgrading item](#upgrading-item)
+    + [Using Town Portar Scroll](#using-town-portar-scroll)
+    + [Using the Courier](#using-the-courier)
 
 # Prerequisite
 1. Python 3
@@ -163,7 +163,7 @@ On the rendering PC, you can check the training result better than the graph as 
 [![Dota2 single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-## 4. Buying and using item
+## 4. Ability and Item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
 The Tango that is most basic item can be purchased at the store when start of game. Hero can use it on the surrounding trees to regenerate the health. Let's see how to write a code this item.
@@ -297,7 +297,7 @@ After implementing all of the above Lua scripts, hero can purchase and use Tango
 [![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 Tango item video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-## 5. Learning and using ability
+### Learning and using ability
 Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. Furthermore, the method of selecting the target for each ability is slightly different. Target can be nothing, unit, and tree.
 
 <img src="image/shadowraze_description.png" width="300">
@@ -348,7 +348,7 @@ The video below shows how to use the above code to acquire a magic wand.
 [![Dota2 upgrade item demo](https://img.youtube.com/vi/EbCzKKf4aao/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-## 7. Using Town Portar Scroll
+### Using Town Portar Scroll
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero should use the Town Portal scroll to join and exit from battle. 
 
 <img src="image/dota2_tp_scrool.png" width="300">
@@ -370,7 +370,7 @@ action_pb.castLocation.location.z = 0
 <strong>Click to Watch!</strong>
 
 
-## 8. Using the Courier
+### Using the Courier
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero of battle point can use the Courier to obtain the items without moving to starting point.
 
 <img src="image/dota2_courier.png" width="300">
