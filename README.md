@@ -167,7 +167,7 @@ On the rendering PC, you can check the training result better than the graph as 
 ## 4. Ability and Item
 Unlike the Derk game, where items and ability are chosen at the start of game, the hero of Dota2 can improve the them gradually during the playing time.
 
-<img src="image/ability_item_inrto.png " width="300">
+<img src="image/ability_item_inrto.png " width="800">
 
 Therefore, hero need to decide what abilities and items to buy when leveling up or collecting ma certain amount of gold. The Rule Based method is used for that part because there is no suitable Learning-Based method can deal with it.
 
