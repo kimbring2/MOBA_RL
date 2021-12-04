@@ -27,6 +27,11 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 8. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
 9. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
 
+# Reference
+1. Dotaservice: https://github.com/TimZaman/dotaservice
+2. Dotaclient: https://github.com/TimZaman/dotaclient
+3. LastOrder-Dota2: https://github.com/bilibili/LastOrder-Dota2
+
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
 
