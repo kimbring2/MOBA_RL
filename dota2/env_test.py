@@ -7,7 +7,7 @@ from dotaservice.protos.dota_shared_enums_pb2 import DOTA_GAMEMODE_1V1MID, DOTA_
 from dotaservice.protos.DotaService_pb2 import HostMode
 from dotaservice.protos.DotaService_pb2 import ObserveConfig
 from dotaservice.protos.DotaService_pb2 import TEAM_DIRE, TEAM_RADIANT, Hero, HeroPick, HeroControlMode
-from dotaservice.protos.DotaService_pb2 import NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_SNIPER
+from dotaservice.protos.DotaService_pb2 import NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_SNIPER, NPC_DOTA_HERO_OMNIKNIGHT
 from dotaservice.protos.DotaService_pb2 import HERO_CONTROL_MODE_IDLE, HERO_CONTROL_MODE_DEFAULT, HERO_CONTROL_MODE_CONTROLLED
 from dotaservice.protos.DotaService_pb2 import Status
 from dotaservice.protos.dota_gcmessages_common_bot_script_pb2 import CMsgBotWorldState
@@ -38,12 +38,12 @@ else:
 modes = [HERO_CONTROL_MODE_CONTROLLED, HERO_CONTROL_MODE_DEFAULT]
 hero_picks = [
         HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_NEVERMORE, control_mode=modes[0]),
-        HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
+        HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_OMNIKNIGHT, control_mode=modes[0]),
         HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
         HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
         HeroPick(team_id=TEAM_RADIANT, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
         HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_NEVERMORE, control_mode=modes[1]),
-        HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
+        HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_OMNIKNIGHT, control_mode=modes[1]),
         HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
         HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
         HeroPick(team_id=TEAM_DIRE, hero_id=NPC_DOTA_HERO_SNIPER, control_mode=HERO_CONTROL_MODE_IDLE),
@@ -137,32 +137,42 @@ def get_item_charge(unit, item_id):
   return None
 
 
-item_name_list = ['item_clarity', 'item_flask', 'item_ward_observer', 'item_tango', 
-                  'item_gauntlets' 'item_enchanted_mango', 'item_faerie_fire', 'item_magic_stick', 
-                  'item_magic_wand', 'item_circlet', 'item_gauntlets', 'item_recipe_bracer', 'item_boots']
+def get_item_id(unit, item_slot):
+  items = unit.items
+  for item in items:
+    if item.slot == item_slot: # and item['slot'] <= 5:
+      return item.ability_id
+
+  return None
+
+
+item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
+                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots']
 
 def get_item_type(unit, item_slot):
-  # 
+  # 0: non target
+  # 1: unit target 
+  # 2: position target
+  # 3: tree target
+  # 4: equipment
   item_dict = {
-    ITEM_CLARITY_ID : 38,
-    ITEM_FLASK_ID : 39,
-    ITEM_WARD_ID : 42,
-    ITEM_WARD_SENTRY_ID : 43,
-    ITEM_TANGO_ID : 44,
-    ITEM_GAUNTLETS_ID : 13,
-    ITEM_MANGO_ID : 216,
-    ITEM_FAERIE_FIRE_ID : 237,
-    ITEM_MAGIC_STICK_ID : 34,
-    ITEM_MAGIC_WAND_ID : 36,
-    ITEM_CIRCLET : 20,
-    ITEM_BRACER : 73,
-    ITEM_BOOTS : 29,
+    ITEM_BRANCH_ID : 2,
+    ITEM_CLARITY_ID : 0,
+    ITEM_WARD_ID : 2,
+    ITEM_TANGO_ID : 3,
+    ITEM_GAUNTLETS_ID : 4,
+    ITEM_MAGIC_STICK_ID : 0,
+    ITEM_MAGIC_WAND_ID : 0,
+    ITEM_CIRCLET : 4,
+    ITEM_BRACER : 4,
+    ITEM_BOOTS : 4,
   }
 
   items = unit.items
   for item in items:
     if item.slot == item_slot:
-      return item.slot
+      item_type = get_item_id(unit, item.slot)
+      return item_dict[item_type]
 
   return None
 
@@ -194,13 +204,11 @@ def in_facing_distance(hero, u, distance, r=250, normalization=False):
         return 0
 
 
+ITEM_BRANCH_ID = 16
 ITEM_CLARITY_ID = 38
-ITEM_FLASK_ID = 39
 ITEM_WARD_ID = 42
 ITEM_TANGO_ID = 44
 ITEM_GAUNTLETS_ID = 13
-ITEM_MANGO_ID = 216
-ITEM_FAERIE_FIRE_ID = 237
 ITEM_MAGIC_STICK_ID = 34
 ITEM_MAGIC_WAND_ID = 36
 ITEM_CIRCLET = 20
@@ -208,24 +216,21 @@ ITEM_RECIPE_BRACER = 72
 ITEM_BRACER = 73
 ITEM_BOOTS = 29
 
-ITEM_ID_LIST = [ITEM_CLARITY_ID, ITEM_FLASK_ID, ITEM_WARD_ID, ITEM_TANGO_ID, ITEM_GAUNTLETS_ID,
-                ITEM_MANGO_ID, ITEM_FAERIE_FIRE_ID, ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, 
-                ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS]
+ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_WARD_ID, ITEM_TANGO_ID, ITEM_GAUNTLETS_ID,
+                ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS]
 def get_item_matrix(unit):
   item_dict = {
-    ITEM_CLARITY_ID : 0,
-    ITEM_FLASK_ID : 1,
+    ITEM_BRANCH_ID : 0,
+    ITEM_CLARITY_ID : 1,
     ITEM_WARD_ID : 2,
     ITEM_TANGO_ID : 3,
     ITEM_GAUNTLETS_ID: 4,
-    ITEM_MANGO_ID : 5,
-    ITEM_FAERIE_FIRE_ID : 6,
-    ITEM_MAGIC_STICK_ID : 7,
-    ITEM_MAGIC_WAND_ID : 8,
-    ITEM_CIRCLET : 9,
-    ITEM_RECIPE_BRACER : 10,
-    ITEM_BRACER : 11,
-    ITEM_BOOTS : 12,
+    ITEM_MAGIC_STICK_ID : 5,
+    ITEM_MAGIC_WAND_ID : 6,
+    ITEM_CIRCLET : 7,
+    ITEM_RECIPE_BRACER : 8,
+    ITEM_BRACER : 9,
+    ITEM_BOOTS : 10,
   }
 
   item_matrix = np.zeros(len(item_dict))
@@ -269,8 +274,10 @@ def get_ability_matrix(unit):
 
 # 'magic_wand': ['item_branches', 'item_branches', 'item_recipe_magic_wand']
 # 'bracer': ['item_circlet', 'item_gauntlets', 'item_recipe_bracer']
+#item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
+#                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer',  'item_boots']
 init_item = [
-              'item_ward_observer'
+              'item_ward_observer', 'item_ward_observer', 'item_tango', 'item_clarity', 'item_magic_stick', 'item_circlet', 
             ]
 
 modifier_name = {
@@ -288,7 +295,8 @@ modifier_name = {
         "modifier_item_observer_ward": 12,
         "modifier_item_gauntlets": 13,
         "modifier_item_magic_stick": 14,
-        "modifier_nevermore_shadowraze_counter": 15
+        "modifier_nevermore_shadowraze_counter": 15,
+        "modifier_item_ironwood_branch": 16
 
     }
 
@@ -305,15 +313,12 @@ blank_slots = [0, 1, 2, 3, 4, 5]
 skill_learn_flag = True
 skill_use_flag = False
 item_buy_flag = 0
-item_use_flag = True
+item_use_flag = False
 move_flag = False
 clarity_flag = False
 tango_flag = False
-mango_flag = False
-ward_flag = True
+ward_flag = False
 stick_flag = False
-faerie_fire_flag = False
-flask_flag = False
 courier_stash_flag = False
 courier_transfer_flag = False
 teleport_flag = False
@@ -325,11 +330,8 @@ async def step():
   global move_flag
   global clarity_flag
   global tango_flag
-  global mango_flag
   global ward_flag
   global stick_flag
-  global faerie_fire_flag
-  global flask_flag
   global courier_stash_flag
   global courier_transfer_flag
   global teleport_flag
@@ -349,7 +351,8 @@ async def step():
   #print('response.world_state.glyph_cooldown: ', response.world_state.glyph_cooldown)
   #print('response.world_state.damage_events: ', response.world_state.damage_events)
 
-  hero_unit = None
+  hero1_unit = None
+  hero2_unit = None
   enermy_hero = None
 
   self_tower = None
@@ -360,11 +363,14 @@ async def step():
     #print("unit.unit_type: ", unit.unit_type)
     #print("unit.handle: ", unit.handle)
     #print("CMsgBotWorldState.UnitType.Value('LANE_CREEP'): ", CMsgBotWorldState.UnitType.Value('LANE_CREEP'))
-    #print("unit.team_id: ", unit.team_id)
     #print("")
-    if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO') and unit.name == "npc_dota_hero_nevermore":
+    if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO'):
       if unit.team_id == TEAM_RADIANT and unit.player_id == 0:
-        hero_unit = unit
+        #print("unit.player_id: ", unit.player_id)
+        hero1_unit = unit
+      elif unit.team_id == TEAM_RADIANT and unit.player_id == 1:
+        #print("unit.player_id: ", unit.player_id)
+        hero2_unit = unit
       elif unit.team_id == TEAM_DIRE:
         enermy_hero = unit
     elif unit.unit_type == CMsgBotWorldState.UnitType.Value('TOWER'):
@@ -383,22 +389,24 @@ async def step():
   #print("self_tower_position: ", self_tower_position)
   #print("enemy_tower_position: ", enemy_tower_position)
   
-  hero_modifiers = hero_unit.modifiers
+  hero1_modifiers = hero1_unit.modifiers
   #print("hero_modifiers: ", hero_modifiers)
-  for hero_modifier in hero_modifiers:
+  for hero1_modifier in hero1_modifiers:
     #print("hero_modifier.name: ", hero_modifier.name)
-    hero_modifier_index = modifier_name[hero_modifier.name]
+    hero1_modifier_index = modifier_name[hero1_modifier.name]
     #print("hero_modifier_index: ", hero_modifier_index)
 
-  dis_2tower = cal_distance(hero_unit.location, self_tower.location)
+  #dis_2tower = cal_distance(hero1_unit.location, self_tower.location)
   #print("dis_2tower: ", dis_2tower)
 
   #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_CHAT')
   
-  hero_location = hero_unit.location
-  hero_item = hero_unit.items
+  hero1_location = hero1_unit.location
+  hero2_location = hero2_unit.location
 
-  self_to_lane_distance = get_lane_distance(hero_unit.location)
+  hero1_item = hero1_unit.items
+
+  #self_to_lane_distance = get_lane_distance(hero1_unit.location)
   #print("self_to_lane_distance: ", self_to_lane_distance)
 
   for unit in response.world_state.units:
@@ -416,77 +424,51 @@ async def step():
           enemey_creep_min = unit
           enemey_creep_min_distance = dist
 
-  ward_item_num = get_item_number(hero_unit, ITEM_WARD_ID)
-  print("ward_item_num: ", ward_item_num)
+  ward_item_num = get_item_number(hero1_unit, ITEM_WARD_ID)
+  #print("ward_item_num: ", ward_item_num)
 
-  clarity_item_num = get_item_number(hero_unit, ITEM_CLARITY_ID)
+  clarity_item_num = get_item_number(hero1_unit, ITEM_CLARITY_ID)
   #print("clarity_item_num: ", clarity_item_num)
 
-  tango_item_num = get_item_number(hero_unit, ITEM_TANGO_ID)
+  tango_item_num = get_item_number(hero1_unit, ITEM_TANGO_ID)
   #print("tango_item_num: ", tango_item_num)
 
-  mango_item_num = get_item_number(hero_unit, ITEM_MANGO_ID)
-  #print("mango_item_num: ", mango_item_num)
-
-  flask_item_num = get_item_number(hero_unit, ITEM_FLASK_ID)
-  #print("flask_item_num: ", flask_item_num)
-
-  faerie_fire_item_num = get_item_number(hero_unit, ITEM_FAERIE_FIRE_ID)
-  #print("faerie_fire_item_num: ", faerie_fire_item_num)
-
-  stick_item_num = get_item_number(hero_unit, ITEM_MAGIC_STICK_ID)
+  stick_item_num = get_item_number(hero1_unit, ITEM_MAGIC_STICK_ID)
   #print("stick_item_num: ", stick_item_num)
 
 
-  ward_item_slot = get_item_slot(hero_unit, ITEM_WARD_ID)
-  print("ward_item_slot: ", ward_item_slot)
+  ward_item_slot = get_item_slot(hero1_unit, ITEM_WARD_ID)
+  #print("ward_item_slot: ", ward_item_slot)
 
-  clarity_item_slot = get_item_slot(hero_unit, ITEM_CLARITY_ID)
+  clarity_item_slot = get_item_slot(hero1_unit, ITEM_CLARITY_ID)
   #print("clarity_item_slot: ", clarity_item_slot)
 
-  tango_item_slot = get_item_slot(hero_unit, ITEM_TANGO_ID)
+  tango_item_slot = get_item_slot(hero1_unit, ITEM_TANGO_ID)
   #print("tango_item_slot: ", tango_item_slot)
 
-  mango_item_slot = get_item_slot(hero_unit, ITEM_MANGO_ID)
-  #print("mango_item_slot: ", mango_item_slot)
-
-  flask_item_slot = get_item_slot(hero_unit, ITEM_FLASK_ID)
-  #print("flask_item_slot: ", flask_item_slot)
-
-  faerie_fire_item_slot = get_item_slot(hero_unit, ITEM_FAERIE_FIRE_ID)
-  #print("faerie_fire_item_slot: ", faerie_fire_item_slot)
-
-  stick_item_slot = get_item_slot(hero_unit, ITEM_MAGIC_STICK_ID)
+  stick_item_slot = get_item_slot(hero1_unit, ITEM_MAGIC_STICK_ID)
   #print("stick_item_slot: ", stick_item_slot)
 
-  item_matrix = get_item_matrix(hero_unit)
+  item_matrix = get_item_matrix(hero1_unit)
   #print("item_matrix: ", item_matrix)
 
-  ability_matrix = get_ability_matrix(hero_unit)
+  ability_matrix = get_ability_matrix(hero1_unit)
   #print("ability_matrix: ", ability_matrix)
 
-  if faerie_fire_item_num != 0:
-    #item_use_flag = True
-    #faerie_fire_flag = True
-    pass
-  #  pass
-  #if mango_item_num != 0:
-  #  item_use_flag = True
-  #  mango_flag = True
-
-  print("hero_location: ", hero_location)
+  print("hero1_location: ", hero1_location)
+  print("hero2_location: ", hero2_location)
   #print("enemey_creep_min_distance: ", enemey_creep_min_distance)
   #if enemey_creep_min_distance < 2000:
   #  skill_use_flag = True
 
   if enermy_hero != None:
-    enemey_hero_distance = in_facing_distance(enermy_hero, hero_unit, 750, r=250, normalization=False)
+    enemey_hero_distance = in_facing_distance(enermy_hero, hero1_unit, 750, r=250, normalization=False)
     #print("enemey_hero_distance: ", enemey_hero_distance)
 
     if enemey_hero_distance == 1:
       skill_use_flag = True
 
-  for ability in hero_unit.abilities:
+  for ability in hero1_unit.abilities:
     #ability_name_type = get_ability_name_type(ability)
     #print("ability_name_type: ", ability_name_type)
 
@@ -521,7 +503,7 @@ async def step():
   #print("hero_unit.primary_attribute: ", hero_unit.primary_attribute)
 
   #print("hero_item: ", hero_item)
-  for item in hero_unit.items:
+  for item in hero1_unit.items:
     #print("item: ", item)
     #print("item.ability_id: ", item.ability_id)
     #print("item.charges: ", item.charges)
@@ -529,20 +511,16 @@ async def step():
     #print("item.slot: ", item.slot)
     #print("item.cooldown_remaining: ", item.cooldown_remaining)
 
-    if item.ability_id == 34:
-      if item.is_activated == True:
-        #print("item.ability_id: ", item.ability_id)
-        #print("item.charges: ", item.charges)
-        #print("item.is_activated: ", item.is_activated)
-        #print("item.slot: ", item.slot)
-        #print("item.cooldown_remaining: ", item.cooldown_remaining)
+    if item.slot <= 6:
+      print("item.slot: ", item.slot)
+      #item_id = get_item_id(hero_unit, item.slot)
+      #print("item_id: ", item_id)
+      item_type = get_item_type(hero1_unit, item.slot)
+      print("item_type: ", item_type)
 
-        #stick_flag = True
-        pass
-
-  if (abs(self_tower.location.x + 300 - hero_location.x) >= 500) or (abs(self_tower.location.y + 300 - hero_location.y) >= 500):
+  if (abs(self_tower.location.x + 300 - hero1_location.x) >= 500) or (abs(self_tower.location.y + 300 - hero1_location.y) >= 500):
     if item_buy_flag == len(init_item):
-      #move_flag = True
+      move_flag = True
       #courier_flag = True
       pass
   else:
@@ -563,138 +541,139 @@ async def step():
   print("item_use_flag: ", item_use_flag)
 
   #action_pb.chat.CopyFrom(t) 
-  action_pb = CMsgBotWorldState.Action()
+  action_pb1 = CMsgBotWorldState.Action()
+  action_pb2 = CMsgBotWorldState.Action()
   if dota_time > -80.0:
     if item_buy_flag != len(init_item):
       #print("test")
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
-      action_pb.player = 0
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
+      action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
 
       i = CMsgBotWorldState.Action.PurchaseItem()
       i.item = 2
       i.item_name = init_item[item_buy_flag]
 
-      action_pb.purchaseItem.CopyFrom(i) 
+      action_pb1.purchaseItem.CopyFrom(i) 
+      action_pb2.purchaseItem.CopyFrom(i) 
+
       item_buy_flag += 1
       #item_use_flag = True
       #courier_stash_flag = True
     elif item_use_flag == True:
+      # 0: non target
+      # 1: unit target
+      # 2: position target
+      # 3: tree target
       if clarity_flag == True and clarity_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-        action_pb.player = 0 
-        action_pb.castTarget.abilitySlot = -(clarity_item_slot + 1)
-        action_pb.castTarget.target = hero_unit.handle
+        # 0: non target
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
+        action_pb1.castTarget.abilitySlot = -(clarity_item_slot + 1)
+        action_pb1.castTarget.target = hero1_unit.handle
         clarity_flag = False
       elif tango_flag == True and tango_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
-        action_pb.player = 0
-        action_pb.castTree.abilitySlot = -(tango_item_slot + 1)
-        #action_pb.castTree.abilitySlot = 0
-        action_pb.castTree.tree = 10
+        # 3: tree target
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
+        action_pb1.castTree.abilitySlot = -(tango_item_slot + 1)
+        action_pb1.castTree.tree = 10
         tango_flag = False
-      elif mango_flag == True and mango_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-        action_pb.player = 0 
-        action_pb.cast.abilitySlot = -(mango_item_slot + 1)
-        mango_flag = False
       elif stick_flag == True and stick_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-        action_pb.player = 0 
-        action_pb.cast.abilitySlot = -(stick_item_slot + 1)
+        # 0: non target
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+        action_pb1.cast.abilitySlot = -(stick_item_slot + 1)
         stick_flag = False
       elif ward_flag == True:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
-        action_pb.player = 0
-        action_pb.castLocation.abilitySlot = -1
-        action_pb.castLocation.location.x = hero_location.x + 600
-        action_pb.castLocation.location.y = hero_location.y + 600
-        action_pb.castLocation.location.z = 0
+        # 2: position target
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+        action_pb1.castLocation.abilitySlot = -1
+        action_pb1.castLocation.location.x = hero1_location.x + 600
+        action_pb1.castLocation.location.y = hero1_location.y + 600
+        action_pb1.castLocation.location.z = 0
         ward_flag = False
-      elif faerie_fire_flag == True and faerie_fire_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-        action_pb.player = 0 
-        action_pb.cast.abilitySlot = -(faerie_fire_item_slot + 1)
-        faerie_fire_flag = False
-      elif flask_flag == True and flask_item_num >= 1:
-        action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-        action_pb.player = 0 
-        action_pb.castTarget.abilitySlot = -(flask_item_slot + 1)
-        action_pb.castTarget.target = hero_unit.handle
-        flask_flag = False
       else:
         action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     elif skill_learn_flag == True:
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
-      action_pb.player = 0
-      action_pb.trainAbility.ability = "nevermore_shadowraze1"
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
+      action_pb1.trainAbility.ability = "nevermore_shadowraze1"
+
+      action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
+      action_pb2.trainAbility.ability = "omniknight_purification"
+
       skill_learn_flag = False
     elif move_flag == True:
-      action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
-      action_pb.player = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_MOVE_DIRECTLY')
+      action_pb1.actionDelay = 0
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_MOVE_DIRECTLY')
+
+      action_pb2.actionDelay = 0
+      action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_MOVE_DIRECTLY')
 
       m = CMsgBotWorldState.Action.MoveToLocation()
       m.location.x = -900
       m.location.y = -780
       m.location.z = 0
-      action_pb.moveDirectly.CopyFrom(m)
+
+      action_pb1.moveDirectly.CopyFrom(m)
+      action_pb2.moveDirectly.CopyFrom(m)
+
       move_flag = False
     elif skill_use_flag == True:
       #print("enermy_hero.handle: ", enermy_hero.handle)
       #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-      action_pb.player = 0 
-      action_pb.cast.abilitySlot = 2
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+      action_pb1.cast.abilitySlot = 2
+
+      action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+      action_pb2.cast.abilitySlot = 2
       #action_pb.castTarget.target = enermy_hero.handle
       skill_use_flag = False
     elif courier_stash_flag == True:
-      action_pb.actionDelay = 0 
-      action_pb.player = 0 
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
+      action_pb1.actionDelay = 0 
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
-      action_pb.courier.unit = 0 
-      action_pb.courier.courier = 0
-      action_pb.courier.action = 3
+      action_pb1.courier.unit = 0 
+      action_pb1.courier.courier = 0
+      action_pb1.courier.action = 3
       courier_stash_flag = False
       courier_transfer_flag = True
     elif courier_transfer_flag == True:
-      action_pb.actionDelay = 0 
-      action_pb.player = 0 
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
+      action_pb1.actionDelay = 0 
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
-      action_pb.courier.unit = 0 
-      action_pb.courier.courier = 0
-      action_pb.courier.action = 6
+      action_pb1.courier.unit = 0 
+      action_pb1.courier.courier = 0
+      action_pb1.courier.action = 6
       #courier_transfer_flag = False
     elif teleport_flag == True and dota_time > 20.0:
-      action_pb.actionDelay = 0 
-      action_pb.player = 0 
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+      action_pb1.actionDelay = 0 
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
 
-      action_pb.castLocation.abilitySlot = -16
-      action_pb.castLocation.location.x = -6700
-      action_pb.castLocation.location.y = -6700
-      action_pb.castLocation.location.z = 0
+      action_pb1.castLocation.abilitySlot = -16
+      action_pb1.castLocation.location.x = -6700
+      action_pb1.castLocation.location.y = -6700
+      action_pb1.castLocation.location.z = 0
     else:
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+      action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+      action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
   else:
-    action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+    action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+    action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
   
-  print("action_pb: ", action_pb)
+  print("action_pb1: ", action_pb1)
+  print("action_pb2: ", action_pb2)
   print("")
-  #action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
-  #action_pb.player = 0 
-  #action_pb.purchaseItem.CopyFrom(i) 
-  #item_flag = True
 
   actions = []
   for i in range(0, 1):
-    actions.append(action_pb)
+    action_pb1.player = 0
+    actions.append(action_pb1)
+
+  for i in range(0, 1):
+    action_pb2.player = 1
+    actions.append(action_pb2)
 
   actions_pb = CMsgBotWorldState.Actions(actions=actions)
-    
   response = await asyncio.wait_for(env.act(Actions(actions=actions_pb, team_id=TEAM_RADIANT)), timeout=120)
   #print('response_home.world_state.dota_time: ', response_home.world_state.dota_time)
+
   print("")
 
 
