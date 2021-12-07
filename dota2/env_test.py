@@ -147,7 +147,9 @@ def get_item_id(unit, item_slot):
 
 
 item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
-                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots']
+                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots',
+                  'item_faerie_fire', 'item_flask', 'item_enchanted_mango'
+                  ]
 
 def get_item_type(unit, item_slot):
   # 0: non target
@@ -166,6 +168,10 @@ def get_item_type(unit, item_slot):
     ITEM_CIRCLET : 4,
     ITEM_BRACER : 4,
     ITEM_BOOTS : 4,
+    ITEM_FLASK_ID : 1,
+    ITEM_MANGO_ID : 0,
+    ITEM_FAERIE_FIRE_ID : 0,
+    ITEM_MAGIC_WAND_ID : 0
   }
 
   items = unit.items
@@ -206,15 +212,19 @@ def in_facing_distance(hero, u, distance, r=250, normalization=False):
 
 ITEM_BRANCH_ID = 16
 ITEM_CLARITY_ID = 38
+ITEM_FLASK_ID = 39
 ITEM_WARD_ID = 42
+ITEM_WARD_SENTRY_ID = 43
 ITEM_TANGO_ID = 44
 ITEM_GAUNTLETS_ID = 13
 ITEM_MAGIC_STICK_ID = 34
 ITEM_MAGIC_WAND_ID = 36
+ITEM_MANGO_ID = 216
 ITEM_CIRCLET = 20
 ITEM_RECIPE_BRACER = 72
 ITEM_BRACER = 73
 ITEM_BOOTS = 29
+ITEM_FAERIE_FIRE_ID = 237
 
 ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_WARD_ID, ITEM_TANGO_ID, ITEM_GAUNTLETS_ID,
                 ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS]
@@ -277,11 +287,11 @@ def get_ability_matrix(unit):
 #item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
 #                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer',  'item_boots']
 init_item_1 = [
-              'item_gauntlets', 'item_tango', 'item_branches'
+              'item_flask', 'item_faerie_fire', 'item_enchanted_mango'
               ]
 
 init_item_2 = [
-              'item_magic_stick', 'item_clarity', 'item_circlet'
+              'item_magic_stick', 'item_clarity', 'item_tango', 'item_circlet'
               ]
 
 modifier_name = {
@@ -319,11 +329,14 @@ skill_use_flag1 = False
 skill_use_flag2 = False
 item_buy_flag1 = 0
 item_buy_flag2 = 0
-item_use_flag = False
+item_use_flag = True
 move_flag1 = False
 move_flag2 = False
 clarity_flag = False
 tango_flag = False
+mango_flag = True
+flask_flag = False
+faerie_fire_flag = False
 ward_flag = False
 stick_flag = False
 courier_stash_flag = False
@@ -341,6 +354,9 @@ async def step():
   global move_flag2
   global clarity_flag
   global tango_flag
+  global mango_flag
+  global flask_flag
+  global faerie_fire_flag
   global ward_flag
   global stick_flag
   global courier_stash_flag
@@ -435,6 +451,15 @@ async def step():
           enemey_creep_min = unit
           enemey_creep_min_distance = dist
 
+  flask_item_num = get_item_number(hero1_unit, ITEM_FLASK_ID)
+  #print("flask_item_num: ", flask_item_num)
+
+  mango_item_num = get_item_number(hero1_unit, ITEM_MANGO_ID)
+  print("mango_item_num: ", mango_item_num)
+
+  faerie_fire_item_num = get_item_number(hero1_unit, ITEM_FAERIE_FIRE_ID)
+  #print("faerie_fire_item_num: ", faerie_fire_item_num)
+
   ward_item_num = get_item_number(hero1_unit, ITEM_WARD_ID)
   #print("ward_item_num: ", ward_item_num)
 
@@ -457,22 +482,31 @@ async def step():
   tango_item_slot = get_item_slot(hero1_unit, ITEM_TANGO_ID)
   #print("tango_item_slot: ", tango_item_slot)
 
+  faerie_fire_item_num = get_item_number(hero1_unit, ITEM_FAERIE_FIRE_ID)
+  #print("faerie_fire_item_num: ", faerie_fire_item_num)
+
+  flask_item_slot = get_item_slot(hero1_unit, ITEM_FLASK_ID)
+  #print("flask_item_slot: ", flask_item_slot)
+
+  mango_item_slot = get_item_slot(hero1_unit, ITEM_MANGO_ID)
+  #print("mango_item_slot: ", mango_item_slot)
+
   stick_item_slot = get_item_slot(hero1_unit, ITEM_MAGIC_STICK_ID)
   #print("stick_item_slot: ", stick_item_slot)
 
   item_matrix = get_item_matrix(hero1_unit)
   #print("item_matrix: ", item_matrix)
 
-  ability_matrix = get_ability_matrix(hero1_unit)
+  #ability_matrix = get_ability_matrix(hero1_unit)
   #print("ability_matrix: ", ability_matrix)
 
-  print("hero1_location: ", hero1_location)
-  print("hero2_location: ", hero2_location)
+  #print("hero1_location: ", hero1_location)
+  #print("hero2_location: ", hero2_location)
 
-  print("hero1_unit.health_max: ", hero1_unit.health_max)
-  print("hero1_unit.health: ", hero1_unit.health)
+  #print("hero1_unit.health_max: ", hero1_unit.health_max)
+  #print("hero1_unit.health: ", hero1_unit.health)
 
-  if hero1_unit.health < 300:
+  if hero1_unit.health < 500:
     skill_use_flag2 = True
   #print("enemey_creep_min_distance: ", enemey_creep_min_distance)
   #if enemey_creep_min_distance < 2000:
@@ -497,7 +531,19 @@ async def step():
     #print("ability.cooldown_remaining: ", ability.cooldown_remaining)
     #print("")
     pass
-  
+
+  for ability in hero2_unit.abilities:
+    #ability_name_type = get_ability_name_type(ability)
+    #print("ability_name_type: ", ability_name_type)
+
+    #print("ability: ", ability)
+    #print("ability.ability_id: ", ability.ability_id)
+    #print("ability.slot: ", ability.slot)
+    #print("ability.is_activated: ", ability.is_activated)
+    #print("ability.level: ", ability.level)
+    #print("ability.cooldown_remaining: ", ability.cooldown_remaining)
+    #print("")
+    pass
   
   #print("hero_unit.action_type: ", hero_unit.action_type)
   #print("hero_unit.anim_activity: ", hero_unit.anim_activity)
@@ -562,8 +608,8 @@ async def step():
   #print("move_flag1: ", move_flag1)
   #print("move_flag2: ", move_flag2)
   #print("item_use_flag: ", item_use_flag)
-  print("item_buy_flag1: ", item_buy_flag1)
-  print("item_buy_flag2: ", item_buy_flag2)
+  #print("item_buy_flag1: ", item_buy_flag1)
+  #print("item_buy_flag2: ", item_buy_flag2)
 
   #action_pb.chat.CopyFrom(t) 
   action_pb1 = CMsgBotWorldState.Action()
@@ -598,6 +644,10 @@ async def step():
         action_pb1.castTree.abilitySlot = -(tango_item_slot + 1)
         action_pb1.castTree.tree = 10
         tango_flag = False
+      elif mango_flag == True and mango_item_num >= 1:
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+        action_pb1.cast.abilitySlot = -(mango_item_slot+1)
+        mango_flag = False
       elif stick_flag == True and stick_item_num >= 1:
         # 0: non target
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
@@ -611,6 +661,14 @@ async def step():
         action_pb1.castLocation.location.y = hero1_location.y + 600
         action_pb1.castLocation.location.z = 0
         ward_flag = False
+      elif flask_flag == True:
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
+        action_pb1.castTarget.target = hero1_unit.handle
+        faerie_fire_flag = False
+      elif faerie_fire_flag == True:
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
+        action_pb1.cast.abilitySlot = -(faerie_fire_item_slot+1)
+        faerie_fire_flag = False
       else:
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     elif skill_learn_flag1 == True:
@@ -679,11 +737,12 @@ async def step():
       item_buy_flag2 += 1
     elif skill_learn_flag2 == True:
       action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
-      action_pb2.trainAbility.ability = "omniknight_purification"
+      #action_pb2.trainAbility.ability = "omniknight_purification"
+      action_pb2.trainAbility.ability = "omniknight_repel"
       skill_learn_flag2 = False
     elif skill_use_flag2 == True:
       action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-      action_pb2.castTarget.abilitySlot = 0
+      action_pb2.castTarget.abilitySlot = 1
       action_pb2.castTarget.target = hero1_unit.handle
       skill_use_flag2 = False
     elif move_flag2 == True:
@@ -703,7 +762,7 @@ async def step():
   else:
     action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
 
-  #print("action_pb1: ", action_pb1)
+  print("action_pb1: ", action_pb1)
   #print("action_pb2: ", action_pb2)
   print("")
 
