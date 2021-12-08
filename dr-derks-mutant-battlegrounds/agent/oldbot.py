@@ -34,7 +34,7 @@ class DerkPlayer:
 
         self.discrete_maker = SmartDiscrete(ignore_keys=[])
 
-        self.action_dim = 16
+        self.action_dim = 15
 
         self.n_agents = n_agents
         self.n_arenas = int(n_agents / 3)
@@ -47,11 +47,9 @@ class DerkPlayer:
 
         self.run_id = np.random.randint(low=0, high=np.iinfo(np.int64).max, size=self.n_arenas, dtype=np.int64)
 
-        self.client_1 = grpc.Client("localhost:8685")
-        self.client_2 = grpc.Client("localhost:8686")
-        self.client_3 = grpc.Client("localhost:8687")
+        self.client = grpc.Client("localhost:8686")
 
-        self.writer = tf.summary.create_file_writer("/home/kimbring2/dr-derks-mutant-battlegrounds/tboard/agent2/")
+        self.writer = tf.summary.create_file_writer("./tboard/agent2/")
 
     def signal_env_reset(self, obs):
         """
@@ -131,15 +129,15 @@ class DerkPlayer:
             _done_n_arena =_done_n[0]
             #print("_done_n_arena: " + str(_done_n_arena))
 
-            _obs_n_agent_1.append(_obs_n_arena[0])
+            _obs_n_agent_1.append(np.concatenate((_obs_n_arena[0], _obs_n_arena[1], _obs_n_arena[2]), axis=0))
             _rew_n_agent_1.append(_rew_n_arena[0])
             _done_n_agent_1.append(_done_n_arena)
 
-            _obs_n_agent_2.append(_obs_n_arena[1])
+            _obs_n_agent_2.append(np.concatenate((_obs_n_arena[1], _obs_n_arena[2], _obs_n_arena[0]), axis=0))
             _rew_n_agent_2.append(_rew_n_arena[1])
             _done_n_agent_2.append(_done_n_arena)
 
-            _obs_n_agent_3.append(_obs_n_arena[2])
+            _obs_n_agent_3.append(np.concatenate((_obs_n_arena[2], _obs_n_arena[0], _obs_n_arena[1]), axis=0))
             _rew_n_agent_3.append(_rew_n_arena[2])
             _done_n_agent_3.append(_done_n_arena)
 
@@ -160,6 +158,8 @@ class DerkPlayer:
         observation_list_3 = []
         abandoned_list_3 = []
         episode_step_list_3 = []
+
+        reward_sum_list = []
         for i in range(self.n_arenas):
             reward_list_1.append(_rew_n_agent_1[i] / 1000.0)
             reward_list_2.append(_rew_n_agent_2[i] / 1000.0)
@@ -169,9 +169,9 @@ class DerkPlayer:
             done_list_2.append(bool(_done_n_agent_2[i]))
             done_list_3.append(bool(_done_n_agent_3[i]))
 
-            observation_list_1.append(np.reshape(_obs_n_agent_1[i], [64]))
-            observation_list_2.append(np.reshape(_obs_n_agent_2[i], [64]))
-            observation_list_3.append(np.reshape(_obs_n_agent_3[i], [64]))
+            observation_list_1.append(np.reshape(_obs_n_agent_1[i], [3, 64]))
+            observation_list_2.append(np.reshape(_obs_n_agent_2[i], [3, 64]))
+            observation_list_3.append(np.reshape(_obs_n_agent_3[i], [3, 64]))
 
             abandoned_list_1.append(False)
             abandoned_list_2.append(False)
@@ -180,6 +180,8 @@ class DerkPlayer:
             episode_step_list_1.append(self.step)
             episode_step_list_2.append(self.step)
             episode_step_list_3.append(self.step)
+
+            reward_sum_list.append(self.reward_sum)
 
         reward_1 = np.array(reward_list_1, dtype=np.float32)
         done_1 = np.array(done_list_1)
@@ -199,26 +201,27 @@ class DerkPlayer:
         abandoned_3 = np.array(abandoned_list_3)
         episode_step_3 = np.array(episode_step_list_3, dtype=np.int32)
 
-        #print("done_1: ", done_1)
-        #print("done_2: ", done_2)
-        #print("done_3: ", done_3)
+        reward_sum_array = np.array(reward_sum_list, dtype=np.float32)
 
         env_output_1 = EnvOutput(reward_1, done_1, observation_1, abandoned_1, episode_step_1)
         env_output_2 = EnvOutput(reward_2, done_2, observation_2, abandoned_2, episode_step_2)
         env_output_3 = EnvOutput(reward_3, done_3, observation_3, abandoned_3, episode_step_3)
         # client.inference(env_id, run_id, env_output, raw_reward)
-        action_agent_1 = self.client_1.inference(np.array(range(0,50), dtype=np.int32), 
-                                                 np.array(range(0,50), dtype=np.int64), 
-                                                 env_output_1, 
-                                                 reward_1)
-        action_agent_2 = self.client_2.inference(np.array(range(0,50), dtype=np.int32), 
-                                                 np.array(range(0,50), dtype=np.int64), 
-                                                 env_output_2, 
-                                                 reward_2)
-        action_agent_3 = self.client_3.inference(np.array(range(0,50), dtype=np.int32), 
-                                                 np.array(range(0,50), dtype=np.int64),  
-                                                 env_output_3, 
-                                                 reward_3)
+
+        #print("reward_1.shape: ", reward_1.shape)
+        #print("np.array([[self.reward_sum.shape]]): ", np.array([[self.reward_sum.shape]]))
+        action_agent_1 = self.client.inference(np.array(range(0,50), dtype=np.int32), 
+                                                        np.array(self.run_id, dtype=np.int64), 
+                                                        env_output_1, 
+                                                        reward_1)
+        action_agent_2 = self.client.inference(np.array(range(50,100), dtype=np.int32), 
+                                                        np.array(self.run_id, dtype=np.int64), 
+                                                        env_output_2, 
+                                                        reward_2)
+        action_agent_3 = self.client.inference(np.array(range(100,150), dtype=np.int32), 
+                                                        np.array(self.run_id, dtype=np.int64), 
+                                                        env_output_3, 
+                                                        reward_3)
         #print("action_index_1: " + str(action_index_1))
         for i in range(self.n_arenas):
             action_index_1 = int(action_agent_1[i])
