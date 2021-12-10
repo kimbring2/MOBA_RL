@@ -390,7 +390,7 @@ action_pb.castLocation.location.z = 0
 ### Using the Courier
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero of battle point can use the Courier to obtain the items without moving to starting point.
 
-<img src="image/dota2_courier.png" width="300">
+<img src="image/dota2_courier.png" width="600">
 
 If hero purchase an item when there is no store around, that item in stored under stash. Below Python code is for transfering that items to the Courier.
 
@@ -422,7 +422,7 @@ Below video shows how the hero of battle point obtains an item without moving to
 ### Using Ability to Other Hero
 In MOBA games, there is a hero who is mainly in charge of attacks, and there is a hero who assists it. Mainly units with abilities such as HP recovery and shield generation can take that position. 
 
-<img src="image/purification_description.png" width="300">
+<img src="image/purification_description.png" width="600">
 
 To use the HP recovery ability for the first hero, you can use the below code.
 
