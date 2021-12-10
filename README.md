@@ -16,6 +16,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Upgrading Item](#upgrading-item)
     + [Using Town Portar Scroll](#using-town-portar-scroll)
     + [Using the Courier](#using-the-courier)
+    + [Using Ability to other Hero](#using-ability-other-hero)
 
 # Prerequisite
 1. Python 3
@@ -386,7 +387,6 @@ action_pb.castLocation.location.z = 0
 [![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-
 ### Using the Courier
 Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero of battle point can use the Courier to obtain the items without moving to starting point.
 
@@ -417,4 +417,40 @@ action_pb.courier.action = 3
 Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
 
 [![Dota2 use courier](https://img.youtube.com/vi/xSvZRYFXErg/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use courier video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
+### Using Ability to Other Hero
+In MOBA games, there is a hero who is mainly in charge of attacks, and there is a hero who assists it. Mainly units with abilities such as HP recovery and shield generation can take that position. 
+
+<img src="image/purification_description.png" width="300">
+
+To use the HP recovery ability for the first hero, you can use the below code.
+
+```
+for unit in response.world_state.units:
+  if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO'):
+    if unit.team_id == TEAM_RADIANT and unit.player_id == 0:
+      hero1_unit = unit
+    elif unit.team_id == TEAM_RADIANT and unit.player_id == 1:
+      hero2_unit = unit
+
+action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
+action_pb2.castTarget.abilitySlot = 1
+action_pb2.castTarget.target = hero1_unit.handle
+
+actions = []
+for i in range(0, 1):
+  action_pb1.player = 0
+  actions.append(action_pb1)
+
+for i in range(0, 1):
+  action_pb2.player = 1
+  actions.append(action_pb2)
+
+actions_pb = CMsgBotWorldState.Actions(actions=actions)
+```
+
+The following shows an example of recovering HP of same team hero.
+
+[![Dota2 use purification](https://img.youtube.com/vi/41a3XyxKlus/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use use purification video - Click to Watch!")
 <strong>Click to Watch!</strong>
