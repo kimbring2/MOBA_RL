@@ -136,7 +136,7 @@ To see proper behavior, you need to put the weight trained on training PC in the
 ## 3. Training Environment
 You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md) of Docker of the dotaservice.
 
-
+Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
 
 <img src="image/training_environment.png " width="800">
 
