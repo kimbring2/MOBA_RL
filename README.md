@@ -16,7 +16,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Upgrading Item](#upgrading-item)
     + [Using Town Portar Scroll](#using-town-portar-scroll)
     + [Using the Courier](#using-the-courier)
-    + [Using Ability to other Hero](#using-ability-other-hero)
+    + [Using Ability to Other Hero](#using-ability-other-hero)
 
 # Prerequisite
 1. Python 3
