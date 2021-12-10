@@ -27,8 +27,8 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 6. Dotaservice of TimZaman
 7. Seed RL of Google
 8. Ubuntu 20.04
-9. RTX 3060 GPU, 16GB RAM is used to run Dota2 environment with rendering
-10. RTX 3080 GPU, 46GB RAM is used to training 16 number of headless Dota2 environment together in my case
+11. No GPU, 30GB RAM Desktop is used to make multiple Dokcer container of Dotaservice
+10. RTX 3080 GPU, 46GB RAM Desktop is make the IMPALA RL agent
 
 # Reference
 1. Seed RL: https://github.com/google-research/seed_rl
