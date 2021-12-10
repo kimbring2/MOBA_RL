@@ -134,22 +134,26 @@ $ python run.py --render True
 To see proper behavior, you need to put the weight trained on training PC in the [model](https://github.com/kimbring2/MOBA_RL/tree/main/dota2/model) folder.
 
 ## 3. Training Environment
-You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md) of Docker of the dotaservice.
-
 Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
+
+You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md).  
 
 <img src="image/training_environment.png " width="800">
 
-You can run the Seel RL for Dota2 using below command.
+First, you need to run the Docker containers of Dotaservice using below command on no GPU pc.
 ```
 $ ./run_dotaservice.sh 16
+
+Next, you need to run the IMPALA RL at GPU PC using below command.
+```
 $ ./run_impala.sh 16
 ```
 
-Addidinally, you can terminate all process using below command.
+Addidinally, you can terminate both process using below command.
 ```
 $ ./stop.sh
 ```
+
 If you search through the tmux, you can see that 16 dotaservices is ran in one terminal and the other terminal runs 1 learner and 16 actors.
 
 <img src="image/dota2_server_log.png " width="1000">
