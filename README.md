@@ -136,6 +136,10 @@ To see proper behavior, you need to put the weight trained on training PC in the
 ## 3. Training Environment
 You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md) of Docker of the dotaservice.
 
+
+
+<img src="image/training_environment.png " width="800">
+
 You can run the Seel RL for Dota2 using below command.
 ```
 $ ./run_dotaservice.sh 16
