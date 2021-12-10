@@ -143,6 +143,7 @@ You need to build the Docker image of Dotaservice mentioned in [README](https://
 First, you need to run the Docker containers of Dotaservice using below command on no GPU pc.
 ```
 $ ./run_dotaservice.sh 16
+```
 
 Next, you need to run the IMPALA RL at GPU PC using below command.
 ```
