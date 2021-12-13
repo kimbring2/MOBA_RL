@@ -69,7 +69,9 @@ In the case of Derk environment, you can render game and train agent at the same
 ## 1. Network Architecture
 Unlike network for Derk game, which consists of one for observation processing and one for action selecting network, Dota2 agent needs a 6 observation processing networks and 5 action processing networks due to the large size of the game.
 
-<img src="image/dota2_network.png " width="1000">
+<img src="image/dota2_shadowfiend_network.png " width="1000">
+
+<img src="image/dota2_omninight_network.png " width="1000">
 
 ## 2. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
