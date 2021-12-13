@@ -215,9 +215,7 @@ Unlike the Derk game, where ability are given at the start, the hero of Dota2 mu
 
 <img src="image/shadowraze_description.png" width="300">
 
-The Shadowraze does not require the target.
-
-It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
+The Shadowraze does not require the target. It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
 
 [![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 Shadowraze ability video - Click to Watch!")
 <strong>Click to Watch!</strong>
@@ -228,8 +226,6 @@ Unlike the Derk game, where item are not changed until end of game, the hero of 
 For example, in the case of the Magic Stick, which is a very early game, it can be upgraded to the Magic Wand by using 2 Iron Branch and 1 Recipe like a below image.
 
 <img src="image/dota2_magic_wand.png" width="600">
-
-When implementing that as Python code, you can just save the item name in the list and use that as sequently for purchasing each item.
 
 The video below shows how to use obtain the magic wand from recipe.
 
@@ -251,9 +247,7 @@ Unlike the Derk game, where map size small, the range of Dota2 between starting 
 
 <img src="image/dota2_courier.png" width="600">
 
-If hero purchase an item when there is no store around, that item in stored under stash.
-
-Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
+If hero purchase an item when there is no store around, that item in stored under stash. Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
 
 [![Dota2 use courier](https://img.youtube.com/vi/xSvZRYFXErg/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use courier video - Click to Watch!")
 <strong>Click to Watch!</strong>
