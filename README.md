@@ -71,7 +71,7 @@ Unlike network for Derk game, which consists of one for observation processing a
 
 <img src="image/dota2_shadowfiend_network.png " width="1000">
 
-<img src="image/dota2_omninight_network.png " width="1000">
+<img src="image/dota2_omniknight_network.png " width="1000">
 
 ## 2. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
