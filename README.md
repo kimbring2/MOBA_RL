@@ -227,7 +227,7 @@ For example, in the case of the Magic Stick, which is a very early game, it can 
 
 <img src="image/dota2_magic_wand.png" width="600">
 
-The video below shows how to use obtain the magic wand from recipe.
+The video below shows how to obtain the magic wand from recipe.
 
 [![Dota2 upgrade item demo](https://img.youtube.com/vi/EbCzKKf4aao/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
 <strong>Click to Watch!</strong>
