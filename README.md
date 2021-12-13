@@ -201,7 +201,7 @@ Therefore, hero need to decide what abilities and items to buy when leveling up 
 ### Buying and Using Item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
-The Tango that is most basic item can be purchased at the store when start of game. Hero can use it on the surrounding trees to regenerate the health. Let's see how to write a code this item.
+The Tango is most basic item can be purchased at the store when start of game. Hero can use it on the near trees to regenerate the health. Let's see how to write a code this item.
 
 <img src="image/tango_description.png" width="300">
 
