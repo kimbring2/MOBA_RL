@@ -205,8 +205,6 @@ The Tango is most basic item can be purchased at the store when start of game. H
 
 <img src="image/tango_description.png" width="300">
 
-To add the ability to purchase and use items, you must first add a below code line to the [action_processor.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/action_processor.lua) of dotaservice.
-
 Hero can purchase and use Tango items like a below video.
 
 [![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 Tango item video - Click to Watch!")
