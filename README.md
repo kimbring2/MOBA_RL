@@ -201,133 +201,13 @@ Therefore, hero need to decide what abilities and items to buy when leveling up 
 ### Buying and Using Item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
 
-The Tango is most basic item can be purchased at the store when start of game. Hero can use it on the near trees to regenerate the health. Let's see how to write a code this item.
+The Tango is most basic item can be purchased at the store when start of game. Hero can use it on the near trees to regenerate the health.
 
 <img src="image/tango_description.png" width="300">
 
 To add the ability to purchase and use items, you must first add a below code line to the [action_processor.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/action_processor.lua) of dotaservice.
 
-```
-local purchaseItem = require( "bots/actions/purchase_item" )
-```
-
-Then add the following line to the [bot_generic.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/bot_generic.lua) file.
-
-```
-elseif action.actionType == "DOTA_UNIT_ORDER_PURCHASE_ITEM" then
-        action_table[action.actionType] = {{action.purchaseItem.item}, {action.purchaseItem.itemName}}
-```
-
-Finally, make the purchase_item.lua file to your [actions](https://github.com/TimZaman/dotaservice/tree/master/dotaservice/lua/actions) folder and copy the following content.
-
-```
-local PurchaseItem = {}
-
-PurchaseItem.Name = "Purchase Item"
-PurchaseItem.NumArgs = 2
-
-local tableItemsToBuy = { "item_tango", "item_tango"};
-
-----------------------------------------------------------------------------------------------------
-
-function PurchaseItem:Call( hUnit, item_name )
-	if ( #tableItemsToBuy == 0 )
-	then
-		hUnit:SetNextItemPurchaseValue( 0 );
-		return;
-	end
-
-	local sNextItem = "item_tango"
-  
-	hUnit:SetNextItemPurchaseValue( GetItemCost( sNextItem ) );
-	if ( hUnit:GetGold() >= GetItemCost( sNextItem ) )
-	then
-		hUnit:ActionImmediate_PurchaseItem( sNextItem );
-		table.remove( tableItemsToBuy, 1 );
-	end
-
-end
-
-----------------------------------------------------------------------------------------------------
-return PurchaseItem
-```
-
-Lua script for item can be used in Python as below code. If you put this part at the beginning of the game, the hero is able to battle more long time.
-
-```
-i = CMsgBotWorldState.Action.PurchaseItem()
-i.item = 0
-i.item_name = "item_tango"
-
-action_pb = CMsgBotWorldState.Action()
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
-action_pb.player = 0
-action_pb.purchaseItem.CopyFrom(i) 
-```
-
-As explained above, Tango items can be used for tree object. The fastest way for that is to find the closest tree near hero and use it as the target. To implement this method, you need to change the contents of the [use_ability_on_tree.lua](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/lua/actions/use_ability_on_tree.lua) file little bit.
-
-```
-local UseAbilityOnTree = {}
-
-UseAbilityOnTree.Name = "Use Ability On Tree"
-UseAbilityOnTree.NumArgs = 4
-
--------------------------------------------------
-function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
-    local hItem_1 = hUnit:GetItemInSlot(0)
-    local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
-    if not hAbility then
-        print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
-        do return end
-    end
-
-    intTree = intTree[1]
-    iType = iType[1]
-
-    -- Note: we do not test if the tree can be ability-targeted due to
-    -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
-    -- We assume only valid and legal actions are agent selected
-    local tableNearbyTrees = hUnit:GetNearbyTrees(500);
-    if tableNearbyTrees[1] then
-        intTree = tableNearbyTrees[1]
-    end
-
-    local vLoc = GetTreeLocation(intTree)
-
-    DebugDrawCircle(vLoc, 25, 255, 0, 0)
-    DebugDrawLine(hUnit:GetLocation(), vLoc, 255, 0, 0)
-
-    hAbility = hItem_1
-    if iType == nil or iType == ABILITY_STANDARD then
-        hUnit:Action_UseAbilityOnTree(hAbility, intTree)
-    elseif iType == ABILITY_PUSH then
-        hUnit:ActionPush_UseAbilityOnTree(hAbility, intTree)
-    elseif iType == ABILITY_QUEUE then
-        hUnit:ActionQueue_UseAbilityOnTree(hAbility, intTree)
-    end
-end
--------------------------------------------------
-
-return UseAbilityOnTree
-```
-
-The trees around hero can be found using the GetNearbyTrees function of Lua. You need to give a 0 as an index for the GetItemInSlot function because the Tango is stored at the first place of the hero slot.
-
-Just like buying a Tango item, you can use the Tango item as in the code below after implementing the Lua script.
-
-```
-t = CMsgBotWorldState.Action.CastTree()
-t.abilitySlot = 0
-t.tree = 50
-
-action_pb = CMsgBotWorldState.Action()
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET_TREE')
-action_pb.player = 0
-action_pb.castTree.CopyFrom(t) 
-```
-
-After implementing all of the above Lua scripts, hero can purchase and use Tango items like a below video.
+Hero can purchase and use Tango items like a below video.
 
 [![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 Tango item video - Click to Watch!")
 <strong>Click to Watch!</strong>
@@ -337,13 +217,7 @@ Unlike the Derk game, where ability are given at the start, the hero of Dota2 mu
 
 <img src="image/shadowraze_description.png" width="300">
 
-The Shadowraze does not require the target. Therefore, we need to write the code as follows.
-
-```
-action_pb = CMsgBotWorldState.Action()
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-action_pb.player = 0
-```
+The Shadowraze does not require the target.
 
 It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
 
@@ -359,26 +233,7 @@ For example, in the case of the Magic Stick, which is a very early game, it can 
 
 When implementing that as Python code, you can just save the item name in the list and use that as sequently for purchasing each item.
 
-```
-item_buy_flag = 0
-
-init_item = [
-              'item_magic_stick', 'item_branches', 'item_branches', 'item_recipe_magic_wand'
-            ]  
-	    
-if item_buy_flag != len(init_item):
-  action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
-  action_pb.player = 0
-
-  i = CMsgBotWorldState.Action.PurchaseItem()
-  i.item = 2
-  i.item_name = init_item[item_buy_flag]
-
-  action_pb.purchaseItem.CopyFrom(i) 
-  item_buy_flag += 1
-```
-
-The video below shows how to use the above code to acquire a magic wand.
+The video below shows how to use obtain the magic wand from recipe.
 
 [![Dota2 upgrade item demo](https://img.youtube.com/vi/EbCzKKf4aao/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
 <strong>Click to Watch!</strong>
@@ -390,17 +245,6 @@ Unlike the Derk game, where map size small, the range of Dota2 between starting 
 
 In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. The Python code for using it is like below.
 
-```
-action_pb.actionDelay = 0 
-action_pb.player = 0 
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
-
-action_pb.castLocation.abilitySlot = -16
-action_pb.castLocation.location.x = -6700
-action_pb.castLocation.location.y = -6700
-action_pb.castLocation.location.z = 0
-```
-
 [![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
@@ -409,27 +253,7 @@ Unlike the Derk game, where map size small, the range of Dota2 between starting 
 
 <img src="image/dota2_courier.png" width="600">
 
-If hero purchase an item when there is no store around, that item in stored under stash. Below Python code is for transfering that items to the Courier.
-
-```
-action_pb.player = 0 
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
-
-action_pb.courier.unit = 0 
-action_pb.courier.courier = 0
-action_pb.courier.action = 6
-```
-
-After taking the stash items, Courier can give them to hero by using below Python code:
-
-```
-action_pb.player = 0 
-action_pb.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
-
-action_pb.courier.unit = 0 
-action_pb.courier.courier = 0
-action_pb.courier.action = 3
-```
+If hero purchase an item when there is no store around, that item in stored under stash.
 
 Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
 
@@ -440,32 +264,6 @@ Below video shows how the hero of battle point obtains an item without moving to
 In MOBA games, there is a hero who is mainly in charge of attacks, and there is a hero who assists it. Mainly units with abilities such as HP recovery and shield generation can take that position. 
 
 <img src="image/purification_description.png" width="600">
-
-To use the HP recovery ability for the first hero, you can use the below code.
-
-```
-for unit in response.world_state.units:
-  if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO'):
-    if unit.team_id == TEAM_RADIANT and unit.player_id == 0:
-      hero1_unit = unit
-    elif unit.team_id == TEAM_RADIANT and unit.player_id == 1:
-      hero2_unit = unit
-
-action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-action_pb2.castTarget.abilitySlot = 1
-action_pb2.castTarget.target = hero1_unit.handle
-
-actions = []
-for i in range(0, 1):
-  action_pb1.player = 0
-  actions.append(action_pb1)
-
-for i in range(0, 1):
-  action_pb2.player = 1
-  actions.append(action_pb2)
-
-actions_pb = CMsgBotWorldState.Actions(actions=actions)
-```
 
 The following shows an example of recovering HP of same team hero.
 
