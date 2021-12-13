@@ -71,6 +71,12 @@ Unlike network for Derk game, which consists of one for observation processing a
 
 <img src="image/dota2_shadowfiend_network.png " width="1000">
 
+Furthermore, each hero has different kind of ability. Some abilities need to be activated by user or other abilities are just passive. That means action part of network structure also should be different from hero to here. 
+
+<img src="image/dota2_ability_type.png " width="1000">
+
+In the case of Shadowfiend which has 4 non passive abilities, ability action network has 4 output. For Omniknight case, network output is three.
+
 <img src="image/dota2_omniknight_network.png " width="1000">
 
 ## 2. Rendering Environment
