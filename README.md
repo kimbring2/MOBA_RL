@@ -237,7 +237,7 @@ Unlike the Derk game, where map size small, the range of Dota2 between starting 
 
 <img src="image/dota2_tp_scrool.png" width="300">
 
-In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. The Python code for using it is like below.
+In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. Below video shows how to come back from battle point to starting point quickly using TP scroll. 
 
 [![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
 <strong>Click to Watch!</strong>
