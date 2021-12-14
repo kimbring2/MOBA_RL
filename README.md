@@ -11,7 +11,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [3. Training Environment](#3-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
-- [Detailed information](#detailed-information)
+- [Detailed Information](#detailed-information)
 - [License](#license)
 
 # Prerequisite
