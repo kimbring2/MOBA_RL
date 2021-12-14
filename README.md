@@ -196,7 +196,7 @@ Unlike the Derk game, where items and ability are chosen at the start of game, t
 
 <img src="image/ability_item_inrto.png " width="800">
 
-Therefore, hero need to decide what abilities and items to buy when leveling up or collecting ma certain amount of gold. The Rule Based method is used for that part because there is no suitable Learning-Based method can deal with it.
+Therefore, hero need to decide what abilities and items to buy when leveling up or collecting certain amount of gold. The Rule Based method is used for that part because there is no suitable Learning-Based method can deal with it.
 
 ### Buying and Using Item
 Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
