@@ -12,6 +12,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Single Hero Training Result](#single-hero-training-result)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
 - [Detailed information](#detailed-information)
+- [License](#license)
 
 # Prerequisite
 1. Python 3
