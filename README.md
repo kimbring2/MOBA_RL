@@ -10,12 +10,6 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [2. Rendering Environment](#2-rendering-environment)
   * [3. Training Environment](#3-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
-  * [4. Ability and Item](#4-ability-and-item)
-    + [Buying and Using Item](#buying-and-using-item)
-    + [Learning and Using Ability](#learning-and-using-ability)
-    + [Upgrading Item](#upgrading-item)
-    + [Using Town Portar Scroll](#using-town-portar-scroll)
-    + [Using the Courier](#using-the-courier)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
 
 # Prerequisite
@@ -197,60 +191,6 @@ Unlike the Derk game, where items and ability are chosen at the start of game, t
 <img src="image/ability_item_inrto.png " width="800">
 
 Therefore, hero need to decide what abilities and items to buy when leveling up or collecting certain amount of gold. The Rule Based method is used for that part because there is no suitable Learning-Based method can deal with it.
-
-### Buying and Using Item
-Unlike the Derk game, where items are given at the start, the hero of Dota2 must visit the item store to purchase the item. I will explain how to write Lua script for that because the dotaservice lacks this part.
-
-The Tango is most basic item can be purchased at the store when start of game. Hero can use it on the near trees to regenerate the health.
-
-<img src="image/tango_description.png" width="300">
-
-Hero can purchase and use Tango items like a below video.
-
-[![Dota2 Tango item demo](https://i.ytimg.com/vi/-Alt7TSRZVg/sddefault.jpg)](https://www.youtube.com/watch?v=-Alt7TSRZVg "Dota2 Tango item video - Click to Watch!")
-<strong>Click to Watch!</strong>
-
-### Learning and using ability
-Unlike the Derk game, where ability are given at the start, the hero of Dota2 must learn the ability to use it. Furthermore, the method of selecting the target for each ability is slightly different. Target can be nothing, unit, and tree.
-
-<img src="image/shadowraze_description.png" width="300">
-
-The Shadowraze does not require the target. It would best to use that ability when an enemy hero or creep is within range of it like a below video. 
-
-[![Dota2 Shadowraze ability demo](https://img.youtube.com/vi/OVScU7aLEpk/sddefault.jpg)](https://www.youtube.com/watch?v=OVScU7aLEpk "Dota2 Shadowraze ability video - Click to Watch!")
-<strong>Click to Watch!</strong>
-
-## 6. Upgrading item
-Unlike the Derk game, where item are not changed until end of game, the hero of Dota2 can upgrade low level items to high level one by using recipe system.
-
-For example, in the case of the Magic Stick, which is a very early game, it can be upgraded to the Magic Wand by using 2 Iron Branch and 1 Recipe like a below image.
-
-<img src="image/dota2_magic_wand.png" width="600">
-
-The video below shows how to obtain the magic wand from recipe.
-
-[![Dota2 upgrade item demo](https://img.youtube.com/vi/EbCzKKf4aao/sddefault.jpg)](https://www.youtube.com/watch?v=EbCzKKf4aao "Dota2 upgrade item video - Click to Watch!")
-<strong>Click to Watch!</strong>
-
-### Using Town Portar Scroll
-Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero should use the Town Portal scroll to join and exit from battle. 
-
-<img src="image/dota2_tp_scrool.png" width="300">
-
-In the case of Town Portar scroll, it is given at start of game, and it is stored in the 15th slot of inventory. After using it, hero can buy it from store using gold. Below video shows how to come back from battle point to starting point quickly using TP scroll. 
-
-[![Dota2 use teloport scroll](https://img.youtube.com/vi/rudbbEhshIw/sddefault.jpg)](https://www.youtube.com/watch?v=rudbbEhshIw "Dota2 use teloport scroll video - Click to Watch!")
-<strong>Click to Watch!</strong>
-
-### Using the Courier
-Unlike the Derk game, where map size small, the range of Dota2 between starting and battle point are long. Therefore, the hero of battle point can use the Courier to obtain the items without moving to starting point.
-
-<img src="image/dota2_courier.png" width="600">
-
-If hero purchase an item when there is no store around, that item in stored under stash. Below video shows how the hero of battle point obtains an item without moving to the starting point using Courier.
-
-[![Dota2 use courier](https://img.youtube.com/vi/xSvZRYFXErg/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use courier video - Click to Watch!")
-<strong>Click to Watch!</strong>
 
 ### Using Ability to Other Hero
 In MOBA games, there is a hero who is mainly in charge of attacks, and there is a hero who assists it. Mainly units with abilities such as HP recovery and shield generation can take that position. 
