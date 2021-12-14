@@ -184,20 +184,12 @@ On the rendering PC, you can check the training result better than the graph as 
 
 [![Dota2 single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
+ 
+# Detailed information
+I am writing explanation for code at Medium as series.
 
-## 4. Ability and Item
-Unlike the Derk game, where items and ability are chosen at the start of game, the hero of Dota2 can improve the them gradually during the playing time.
+1. Training simple MOBA using DRL: https://medium.com/codex/playing-moba-game-using-deep-reinforcement-learning-part-1-106e60aa4110
+2. Using detailed function of Dota2: https://dohyeongkim.medium.com/playing-moba-game-using-deep-reinforcement-learning-part-2-a31573b0a48d
 
-<img src="image/ability_item_inrto.png " width="800">
-
-Therefore, hero need to decide what abilities and items to buy when leveling up or collecting certain amount of gold. The Rule Based method is used for that part because there is no suitable Learning-Based method can deal with it.
-
-### Using Ability to Other Hero
-In MOBA games, there is a hero who is mainly in charge of attacks, and there is a hero who assists it. Mainly units with abilities such as HP recovery and shield generation can take that position. 
-
-<img src="image/purification_description.png" width="600">
-
-The following shows an example of recovering HP of same team hero.
-
-[![Dota2 use purification](https://img.youtube.com/vi/41a3XyxKlus/sddefault.jpg)](https://www.youtube.com/watch?v=xSvZRYFXErg "Dota2 use use purification video - Click to Watch!")
-<strong>Click to Watch!</strong>
+# License
+MIT License
