@@ -18,13 +18,14 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 1. Python 3
 2. tmux
 3. gym-derk 
-4. Tensorflow 2.4.1
-5. TensorFlow Probability 0.11.0
-6. Dotaservice of TimZaman
-7. Seed RL of Google
-8. Ubuntu 20.04
+4. Dota2 Client 5110
+5. Tensorflow 2.4.1
+6. TensorFlow Probability 0.11.0
+7. Dotaservice of TimZaman
+8. Seed RL of Google
+9. Ubuntu 20.04
 11. No GPU, 30GB RAM Desktop mini Desktop is used to make multiple Dokcer container of Dotaservice
-10. GPU, 46GB RAM Desktop is used to make the IMPALA RL agent
+11. GPU, 46GB RAM Desktop is used to make the IMPALA RL agent
 
 # Reference
 1. Seed RL: https://github.com/google-research/seed_rl
@@ -78,7 +79,7 @@ In the case of Shadowfiend which has 4 non passive abilities, ability action net
 ## 2. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
-Occasionally, update from Steam launcher will cause problem such as game stops just right after resetting of Dotaserfice. At this situation, you can download the [working version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. Just put it in the same folder as the existing Dota2 folder and set game path as that.
+Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
 
 Next, you need to download and install [dotaservice](https://github.com/TimZaman/dotaservice). In my case, I should modity the _run_dota function of [dotaservice.py](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/dotaservice.py) like below.
 
