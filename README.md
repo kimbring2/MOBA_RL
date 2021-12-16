@@ -78,6 +78,8 @@ In the case of Shadowfiend which has 4 non passive abilities, ability action net
 ## 2. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
+Occasionally, update from Steam launcher will cause problem such as game stops just right after resetting of Dotaserfice. At this situation, you can download the [working version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. Just put it in the same folder as the existing Dota2 folder and set game path as that.
+
 Next, you need to download and install [dotaservice](https://github.com/TimZaman/dotaservice). In my case, I should modity the _run_dota function of [dotaservice.py](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/dotaservice.py) like below.
 
 ```
