@@ -173,7 +173,7 @@ tensorboard --host 0.0.0.0 --logdir=./tensorboard
 ### Training Result
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
-<img src="image/dota2_train_middle.png .png " width="500">
+<img src="image/dota2_train_middle.png " width="500">
 
 On the rendering PC, you can check the training result better than the graph as shown in the video below. The heros learns how to move to battle point and attack enermy.
 
