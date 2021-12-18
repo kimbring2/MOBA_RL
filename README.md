@@ -185,6 +185,7 @@ I am writing explanation for code at Medium as series.
 
 1. Training simple MOBA using DRL: https://medium.com/codex/playing-moba-game-using-deep-reinforcement-learning-part-1-106e60aa4110
 2. Using detailed function of Dota2: https://dohyeongkim.medium.com/playing-moba-game-using-deep-reinforcement-learning-part-2-a31573b0a48d
+3. Training Dota2 using DRL: https://dohyeongkim.medium.com/playing-moba-game-using-deep-reinforcement-learning-part-3-f5b19b2f984f
 
 # License
 MIT License
