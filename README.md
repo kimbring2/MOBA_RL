@@ -127,18 +127,14 @@ $ python env_test.py --render True
 
 Dota 2 should be successfully launched and the hero selection screen should appear. When entering the main game, you can then use \ key to pop up the console. Then, try use the 'jointeam spec' command to see the hero, tower of entire map.
 
-[![Dota launch demo](https://i.ytimg.com/vi/GzILbfRFnZE/sddefault.jpg)](https://www.youtube.com/watch?v=GzILbfRFnZE "Dota2 launch test video - Click to Watch!")
+[![Dota Launch Demo](https://i.ytimg.com/vi/GzILbfRFnZE/sddefault.jpg)](https://www.youtube.com/watch?v=GzILbfRFnZE "Dota2 launch test video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-Now, you are ready to train Dota2 with Seed RL just as we did in the Derk game. Try to run Seed RL and Dota2 together on the rendering PC with the following command. The hero behaves randomly because model does not be trained yet.
+Now, you are ready to train Dota2 with Seed RL just as we did in the Derk game. Try to run Seed RL and Dota2 together on the rendering PC with the following command. The heros act randomly because model does not be trained yet.
 
 ```
-$ python -m dotaservice
-$ python learner_dota.py
-$ python run.py --render True
+$ ./run_impala_test.sh
 ```
-
-To see proper behavior, you need to put the weight trained on training PC in the [model](https://github.com/kimbring2/MOBA_RL/tree/main/dota2/model) folder.
 
 ## 3. Training Environment
 Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
@@ -149,12 +145,14 @@ You need to build the Docker image of Dotaservice mentioned in [README](https://
 
 First, you need to run the Docker containers of Dotaservice using below command on no GPU pc.
 ```
-$ ./run_dotaservice.sh 16
+$ ./run_dotaservice.sh [number of actors]
+$ ./run_dotaservice.sh 20
 ```
 
 Next, you need to run the IMPALA RL at GPU PC using below command.
 ```
-$ ./run_impala.sh 16
+$ ./run_impala_train.sh [number of actors] [DotaService PC IP]
+$ ./run_impala_train.sh 20 192.168.1.150
 ```
 
 Addidinally, you can terminate both process using below command.
@@ -172,22 +170,14 @@ Run below command to see Tensorboard log of training PC from rendeirng PC remote
 tensorboard --host 0.0.0.0 --logdir=./tensorboard
 ```
 
-### Single Hero Training Result
+### Training Result
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
-<img src="image/dota2_single_reward.png " width="500">
+<img src="image/dota2_train_middle.png .png " width="500">
 
-After finishing training, you need a trained model from training pc to rendering pc. Please copy it to the model folder and run below command at terminal.
+On the rendering PC, you can check the training result better than the graph as shown in the video below. The heros learns how to move to battle point and attack enermy.
 
-```
-$ python -m dotaservice
-$ python learner_dota.py
-$ python run.py --render True
-```
-
-On the rendering PC, you can check the training result better than the graph as shown in the video below. The hero learns how to move to mid area and attack enermy creep.
-
-[![Dota2 single hero demo](https://i.ytimg.com/vi/uc1Zyvg-jl0/sddefault.jpg)](https://www.youtube.com/watch?v=uc1Zyvg-jl0 "Dota2 single hero training video - Click to Watch!")
+[![Dota2 Hero Demo](https://i3.ytimg.com/vi/mHqGHqfrU40/hqdefault.jpg)](https://www.youtube.com/watch?v=mHqGHqfrU40 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
  
 # Detailed information
