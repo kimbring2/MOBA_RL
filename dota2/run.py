@@ -48,7 +48,7 @@ parser.add_argument('--ip', type=str, default='127.0.0.1', help='ip of dotaservi
 arguments = parser.parse_args()
 
 # Connect to the DotaService.
-env = DotaServiceStub(Channel(arguments.ip, 13337 + arguments.id, loop=asyncio.get_event_loop()))
+env = DotaServiceStub(Channel(arguments.ip, 13337 + arguments.id))
 
 
 if arguments.id == 0:
@@ -134,6 +134,8 @@ run_id2 = np.random.randint(low=0, high=np.iinfo(np.int64).max, size=3, dtype=np
 async def step(env):
   global total_step
 
+  print("global total_step")
+
   reward_sum1 = 0.0
   reward_sum2 = 0.0
   reward1 = 0.0
@@ -166,18 +168,18 @@ async def step(env):
   courier_delivery_flag2 = False
   while True:
     try:
-      response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
+      response = await env.observe(ObserveConfig(team_id=TEAM_RADIANT))
     except:
       print("observe break")
       continue
 
     obs = response.world_state
-
+    #time.sleep(1)
     dota_time = obs.dota_time
     #print("dota_time: ", dota_time)
-    if dota_time == 0.0:
-      print("dota_time break")
-      break
+    #if dota_time == 0.0:
+    #  print("dota_time break")
+    #  break
 
     if arguments.id == 0:
       print("total_step: ", total_step)
@@ -189,8 +191,11 @@ async def step(env):
           tf.summary.scalar("reward1", reward_sum1, step=total_step)
           tf.summary.scalar("reward2", reward_sum2, step=total_step)
 
-    if dota_time > 600:
-      print("dota_time is over 600")
+    #if dota_time > 600:
+    #  print("dota_time is over 600")
+    #  break
+    if response.status == Status.Value('DIRE_WIN') or response.status == Status.Value('RADIANT_WIN'):
+      print('End of Game')
       break
 
     dota_time_norm = obs.dota_time / 1200.  # Normalize by 20 minutes
@@ -202,7 +207,7 @@ async def step(env):
 
     hero_unit1 = utils1.get_unit(obs, player_id=0)
     hero_unit2 = utils2.get_unit(obs, player_id=1)
-
+    
     #print("item_flag1: ", item_flag1)
     #print("item_flag2: ", item_flag2)
     #print("item_route_index1: ", item_route_index1)
@@ -450,15 +455,15 @@ async def step(env):
       actions.append(action_pb2)
     
       reward2 = 0
-
+    
     actions_pb = CMsgBotWorldState.Actions(actions=actions)
     #response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
-    _ = await asyncio.wait_for(env.act(Actions(actions=actions_pb, team_id=TEAM_RADIANT)), timeout=120)
+    _ = await env.act(Actions(actions=actions_pb, team_id=TEAM_RADIANT))
 
     if arguments.id == 0:
       print("reward1: ", reward1)
       print("reward2: ", reward2)
-      #print("dota_time: ", dota_time)
+      print("dota_time: ", dota_time)
     else:
       print("dota_time: ", dota_time)
 
