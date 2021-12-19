@@ -177,9 +177,6 @@ async def step(env):
     #time.sleep(1)
     dota_time = obs.dota_time
     #print("dota_time: ", dota_time)
-    #if dota_time == 0.0:
-    #  print("dota_time break")
-    #  break
 
     if arguments.id == 0:
       print("total_step: ", total_step)
@@ -191,12 +188,23 @@ async def step(env):
           tf.summary.scalar("reward1", reward_sum1, step=total_step)
           tf.summary.scalar("reward2", reward_sum2, step=total_step)
 
-    #if dota_time > 600:
-    #  print("dota_time is over 600")
+    #if response.status != Status.Value('OK'):
+    #  print('OK')
     #  break
-    if response.status == Status.Value('DIRE_WIN') or response.status == Status.Value('RADIANT_WIN'):
-      print('End of Game')
+
+    if response.status == Status.Value('DIRE_WIN'):
+      print('DIRE_WIN')
       break
+    elif response.status == Status.Value('RADIANT_WIN'):
+      print('RADIANT_WIN')
+      break
+    elif response.status == Status.Value('RESOURCE_EXHAUSTED'):
+      print('RESOURCE_EXHAUSTED')
+      break
+
+    #if dota_time == 0.0:
+    #  print("dota_time break")
+    #  break
 
     dota_time_norm = obs.dota_time / 1200.  # Normalize by 20 minutes
     creepwave_sin = math.sin(obs.dota_time * (2. * math.pi) / 60)
@@ -463,9 +471,11 @@ async def step(env):
     if arguments.id == 0:
       print("reward1: ", reward1)
       print("reward2: ", reward2)
-      print("dota_time: ", dota_time)
+      #print("dota_time: ", dota_time)
+      #print("response.status: ", response.status)
     else:
       print("dota_time: ", dota_time)
+      #print("response.status: ", response.status)
 
     step += 1
     reward_sum1 += reward1
