@@ -134,13 +134,12 @@ run_id2 = np.random.randint(low=0, high=np.iinfo(np.int64).max, size=3, dtype=np
 async def step(env):
   global total_step
 
-  print("global total_step")
-
   reward_sum1 = 0.0
   reward_sum2 = 0.0
   reward1 = 0.0
   reward2 = 0.0
   step = 0
+  done = False
   prev_level1 = 0
   prev_level2 = 0
   try:
@@ -167,44 +166,45 @@ async def step(env):
   courier_delivery_flag1 = False
   courier_delivery_flag2 = False
   while True:
+    if done == True:
+      print("done == True")
+      if arguments.id == 0:
+        if response.status == Status.Value('RADIANT_WIN'):
+          print('RADIANT_WIN')
+          with writer.as_default():
+            tf.summary.scalar("reward_sum1", reward_sum1, step=total_step)
+            tf.summary.scalar("reward_sum2", reward_sum2, step=total_step)
+        elif response.status == Status.Value('DIRE_WIN'):
+          print('DIRE_WIN')
+          with writer.as_default():
+            tf.summary.scalar("reward_sum1", reward_sum1, step=total_step)
+            tf.summary.scalar("reward_sum2", reward_sum2, step=total_step)
+
+      break
+
     try:
       response = await env.observe(ObserveConfig(team_id=TEAM_RADIANT))
     except:
-      print("observe break")
+      #print("observe break")
       continue
 
     obs = response.world_state
-    #time.sleep(1)
     dota_time = obs.dota_time
-    #print("dota_time: ", dota_time)
 
     if arguments.id == 0:
       print("total_step: ", total_step)
 
-    if total_step % 100 == 0:
-      if arguments.id == 0:
-        with writer.as_default():
-          print("reward record")
-          tf.summary.scalar("reward1", reward_sum1, step=total_step)
-          tf.summary.scalar("reward2", reward_sum2, step=total_step)
-
-    #if response.status != Status.Value('OK'):
-    #  print('OK')
-    #  break
-
-    if response.status == Status.Value('DIRE_WIN'):
-      print('DIRE_WIN')
-      break
-    elif response.status == Status.Value('RADIANT_WIN'):
-      print('RADIANT_WIN')
-      break
+    if response.status == Status.Value('RADIANT_WIN'):
+      #print('RADIANT_WIN')
+      done = True
+    elif response.status == Status.Value('DIRE_WIN'):
+      #print('DIRE_WIN')
+      done = True
     elif response.status == Status.Value('RESOURCE_EXHAUSTED'):
       print('RESOURCE_EXHAUSTED')
-      break
-
-    #if dota_time == 0.0:
-    #  print("dota_time break")
-    #  break
+      done = True
+    else:
+      done = False
 
     dota_time_norm = obs.dota_time / 1200.  # Normalize by 20 minutes
     creepwave_sin = math.sin(obs.dota_time * (2. * math.pi) / 60)
@@ -245,7 +245,7 @@ async def step(env):
               item_flag1 = True
       elif item_flag1 == True:
         if item_index1 <= len(shadowfiend_item_route[item_route_index1]['item']) - 1:
-          print("item_index1: ", item_index1)
+          #print("item_index1: ", item_index1)
           action_pb_item_and_ability1 = utils1.buy_item(shadowfiend_item_route[item_route_index1]['item'][item_index1], 0)
           item_index1 += 1
         else:
@@ -338,7 +338,7 @@ async def step(env):
 
       #print("action_masks: ", action_masks)
       env_output1 = EnvOutput(np.array([reward1], dtype=np.float32), 
-                              np.array([False]), 
+                              np.array([done]), 
                               np.array([env_state], dtype=np.float32), 
                               np.array([allied_heroes1], dtype=np.float32), 
                               np.array([enemy_heroes1], dtype=np.float32), 
@@ -378,6 +378,7 @@ async def step(env):
         reward1 = sum(reward1.values())
       except:
         reward1 = 0
+
     else:
       #print("hero_unit1 none")
 
@@ -414,7 +415,7 @@ async def step(env):
       action_masks2 = utils2.action_masks(player_unit=hero_unit2, unit_handles=unit_handles2)
 
       env_output2 = EnvOutput(np.array([reward2], dtype=np.float32), 
-                              np.array([False]), 
+                              np.array([done]), 
                               np.array([env_state], dtype=np.float32), 
                               np.array([allied_heroes2], dtype=np.float32), 
                               np.array([enemy_heroes2], dtype=np.float32), 
@@ -443,9 +444,10 @@ async def step(env):
       else:
         action_pb2 = action_pb_item_and_ability2
 
+      print("action_pb2: ", action_pb2)
+
       hero_location2 = hero_unit2.location
       
-      #print("action_pb2: ", action_pb2)
       actions.append(action_pb2)
       try:
         reward2 = utils2.get_reward(prev_obs, obs, 1)
@@ -464,24 +466,33 @@ async def step(env):
     
       reward2 = 0
     
+
+    if response.status == Status.Value('RADIANT_WIN'):
+      #print('RADIANT_WIN')
+      reward1 += 5.0
+      reward2 += 5.0
+    elif response.status == Status.Value('DIRE_WIN'):
+      #print('DIRE_WIN')
+      reward1 -= 5.0
+      reward2 -= 5.0
+
+
     actions_pb = CMsgBotWorldState.Actions(actions=actions)
-    #response = await asyncio.wait_for(env.observe(ObserveConfig(team_id=TEAM_RADIANT)), timeout=120)
     _ = await env.act(Actions(actions=actions_pb, team_id=TEAM_RADIANT))
 
     if arguments.id == 0:
       print("reward1: ", reward1)
       print("reward2: ", reward2)
-      #print("dota_time: ", dota_time)
       #print("response.status: ", response.status)
     else:
       print("dota_time: ", dota_time)
       #print("response.status: ", response.status)
 
     step += 1
-    reward_sum1 += reward1
-    reward_sum2 += reward2
     prev_obs = obs
     total_step += 1
+    reward_sum1 += reward1
+    reward_sum2 += reward2
 
 
 async def main():
