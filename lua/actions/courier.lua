@@ -43,15 +43,15 @@ end
 
 
 function ActionCourier:Call(hHero, iCourierAction)
-    print("dump(iCourierAction): ", dump(iCourierAction))
-    print("dump(GetNumCouriers()): ", dump(GetNumCouriers()))
+    --print("dump(iCourierAction): ", dump(iCourierAction))
+    --print("dump(GetNumCouriers()): ", dump(GetNumCouriers()))
 
     if GetNumCouriers() == 0 then return end
     if hHero:IsIllusion() then return end
     local courier = nil
     for i = 0, GetNumCouriers() do
         local t = GetCourier(i)
-        print("dump(hHero:GetPlayerID()): ", dump(hHero:GetPlayerID()))
+        --print("dump(hHero:GetPlayerID()): ", dump(hHero:GetPlayerID()))
         if hHero:GetPlayerID() == t:GetPlayerID() then
         	print("hHero:GetPlayerID() == t:GetPlayerID()")
             courier = t

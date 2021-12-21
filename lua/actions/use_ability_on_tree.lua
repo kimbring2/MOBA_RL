@@ -47,7 +47,7 @@ function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
     -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
     -- We assume only valid and legal actions are agent selected
     local tableNearbyTrees = hUnit:GetNearbyTrees(500);
-    print("dump(tableNearbyTrees): ", dump(tableNearbyTrees))
+    --print("dump(tableNearbyTrees): ", dump(tableNearbyTrees))
     if tableNearbyTrees[1] then
         intTree = tableNearbyTrees[1]
     end

@@ -23,8 +23,8 @@ end
 -------------------------------------------------
 
 function Chat:Call( hHero, sMsg, bAllChat )
-    print("dump(sMsg): ", dump(sMsg))
-    print("dump(bAllChat): ", dump(bAllChat))
+    --print("dump(sMsg): ", dump(sMsg))
+    --print("dump(bAllChat): ", dump(bAllChat))
 
     --hHero:ActionImmediate_Chat(sMsg[1], bAllChat[1])
     hHero:ActionImmediate_Chat(sMsg[1], true)

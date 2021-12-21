@@ -30,7 +30,7 @@ function UseAbilityOnLocation:Call( hUnit, intAbilitySlot, vLoc, iType )
         hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
     else
         itemSlot = -intAbilitySlot[1] - 1
-        print("dump(itemSlot): ", dump(itemSlot))
+        --print("dump(itemSlot): ", dump(itemSlot))
         hAbility = hUnit:GetItemInSlot(itemSlot)
     end
 
