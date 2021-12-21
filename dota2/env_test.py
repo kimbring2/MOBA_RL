@@ -22,8 +22,8 @@ parser.add_argument('--render', type=bool, default=False, help='render with GUI'
 arguments = parser.parse_args()
 
 # Connect to the DotaService.
-#env = DotaServiceStub(Channel('127.0.0.1', 13337))
-env = DotaServiceStub(Channel('192.168.1.150', 13337))
+env = DotaServiceStub(Channel('127.0.0.1', 13337))
+#env = DotaServiceStub(Channel('192.168.1.150', 13337))
 
 TICKS_PER_OBSERVATION = 15
 HOST_TIMESCALE = 10
@@ -57,7 +57,7 @@ async def reset():
         ticks_per_observation=TICKS_PER_OBSERVATION,
         host_timescale=HOST_TIMESCALE,
         host_mode=HOST_MODE,
-        game_mode=DOTA_GAMEMODE_1V1MID,
+        game_mode=DOTA_GAMEMODE_CUSTOM,
         hero_picks=hero_picks,
     )), timeout=120)
 
@@ -308,11 +308,11 @@ init_item_2 = [
 '''
 
 init_item_1 = [
-               'item_ward_observer', 'item_magic_stick', 'item_tango', 'item_tango'
+               'item_boots'
               ]
 
 init_item_2 = [
-               'item_ward_sentry', 'item_clarity', 'item_clarity', 'item_branches'
+               'item_ward_sentry', 'item_circlet', 'item_flask'
               ]
 
 modifier_name = {
@@ -351,8 +351,10 @@ skill_learn_flag1 = True
 skill_learn_flag2 = True
 skill_use_flag1 = False
 skill_use_flag2 = False
-item_buy_flag1 = 0
+item_buy_flag1 = False
 item_buy_flag2 = 0
+item_buy_index1 = 0
+item_buy_index2 = len(init_item_2)
 item_use_flag1 = False
 item_use_flag2 = False
 move_flag1 = False
@@ -376,6 +378,8 @@ async def step():
   global skill_use_flag2
   global item_buy_flag1
   global item_buy_flag2
+  global item_buy_index1
+  global item_buy_index2
   global item_use_flag1
   global item_use_flag2
   global move_flag1
@@ -432,34 +436,6 @@ async def step():
 
     #print('response.world_state.glyph_cooldown: ', response.world_state.glyph_cooldown)
     #print('response.world_state.damage_events: ', response.world_state.damage_events)
-    '''
-    values=[
-    _descriptor.EnumValueDescriptor(
-      name='OK', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='RESOURCE_EXHAUSTED', index=1, number=8,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='FAILED_PRECONDITION', index=2, number=9,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='OUT_OF_RANGE', index=3, number=11,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='RADIANT_WIN', index=4, number=12,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='DIRE_WIN', index=5, number=13,
-      serialized_options=None,
-      type=None),
-    ]
-    '''
     if response.status == Status.Value('DIRE_WIN') or response.status == Status.Value('RADIANT_WIN'):
       print('End of Game')
       break
@@ -503,7 +479,7 @@ async def step():
     #  print("player: ", player)
     #print("self_tower_position: ", self_tower_position)
     #print("enemy_tower_position: ", enemy_tower_position)
-    '''
+    
     hero1_modifiers = hero1_unit.modifiers
     #print("hero_modifiers: ", hero_modifiers)
     for hero1_modifier in hero1_modifiers:
@@ -683,12 +659,13 @@ async def step():
         #print("item_type: ", item_type)
 
     if (abs(-900 - hero1_location.x) >= 500) or (abs(-870 - hero1_location.y) >= 500):
-      if item_buy_flag1 == len(init_item_1):
-        #move_flag1 = True
-        #courier_flag = True
-        pass
+      #if item_buy_index1 == len(init_item_1):
+      move_flag1 = True
+      #courier_flag = True
+      pass
     else:
       if courier_stash_flag == False and courier_transfer_flag == False:
+        item_buy_flag1 = True
         #stick_flag = True
         #item_use_flag = True
         #courier_flag = True
@@ -706,10 +683,11 @@ async def step():
     c.to_allchat = 1
 
     #print("attack_flag1: ", attack_flag1)
-    #print("move_flag1: ", move_flag1)
+    print("move_flag1: ", move_flag1)
     #print("move_flag2: ", move_flag2)
     #print("item_use_flag: ", item_use_flag)
-    #print("item_buy_flag1: ", item_buy_flag1)
+    print("item_buy_flag1: ", item_buy_flag1)
+    print("item_buy_index1: ", item_buy_index1)
     #print("item_buy_flag2: ", item_buy_flag2)
 
     #action_pb.chat.CopyFrom(t) 
@@ -717,18 +695,18 @@ async def step():
     action_pb2 = CMsgBotWorldState.Action()
     #print("skill_use_flag1: ", skill_use_flag1)
     if dota_time > -90.0:
-      if item_buy_flag1 != len(init_item_1):
+      if item_buy_flag1 == True and item_buy_index1 < len(init_item_1):
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
 
         i = CMsgBotWorldState.Action.PurchaseItem()
         i.item = 1
-        i.item_name = init_item_1[item_buy_flag1]
+        i.item_name = init_item_1[item_buy_index1]
 
         action_pb1.purchaseItem.CopyFrom(i) 
 
-        item_buy_flag1 += 1
+        item_buy_index1 += 1
         #item_use_flag = True
-        #courier_stash_flag = True
+        courier_stash_flag = True
       elif attack_flag1 == True:
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_ATTACK_TARGET')
         m = CMsgBotWorldState.Action.AttackTarget()
@@ -823,7 +801,7 @@ async def step():
         action_pb1.courier.unit = 0 
         action_pb1.courier.courier = 0
         action_pb1.courier.action = 6
-        #courier_transfer_flag = False
+        courier_transfer_flag = False
       elif teleport_flag == True and dota_time > 20.0:
         action_pb1.actionDelay = 0 
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
@@ -892,11 +870,11 @@ async def step():
 
     action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
-
-    #print("action_pb1: ", action_pb1)
+    '''
+    print("action_pb1: ", action_pb1)
     #print("action_pb2: ", action_pb2)
     print("")
-
+    
     actions = []
     for i in range(0, 1):
       action_pb1.player = 0
@@ -905,7 +883,7 @@ async def step():
     for i in range(0, 1):
       action_pb2.player = 1
       actions.append(action_pb2)
-
+    
     actions_pb = CMsgBotWorldState.Actions(actions=actions)
     response = await env.act(Actions(actions=actions_pb, team_id=TEAM_RADIANT))
     #print('response_home.world_state.dota_time: ', response_home.world_state.dota_time)

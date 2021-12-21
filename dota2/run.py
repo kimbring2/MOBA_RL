@@ -101,7 +101,9 @@ item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_t
 
 shadowfiend_item_route = [
           {'gold': 0, 'item': ['item_ward_observer', 'item_magic_stick', 'item_tango', 'item_tango']},
-          {'gold': 1000, 'item': ['item_branches', 'item_branches', 'item_recipe_magic_wand']},
+          {'gold': 500, 'item': ['item_boots']},
+          {'gold': 250, 'item': ['item_branches', 'item_branches', 'item_recipe_magic_wand']},
+          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']}
         ]
 
 
@@ -115,8 +117,10 @@ shadowfiend_ability_route = [
 
 
 omniknight_item_route = [
-          {'gold': 0, 'item': ['item_ward_sentry', 'item_clarity', 'item_clarity', 'item_flask']},
-          {'gold': 1000, 'item': ['item_boots']},
+          {'gold': 0, 'item': ['item_ward_sentry', 'item_circlet', 'item_clarity', 'item_flask']},
+          {'gold': 500, 'item': ['item_boots']},
+          {'gold': 350, 'item': ['item_gauntlets', 'item_recipe_bracer']},
+          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']}
         ]
 
 
@@ -217,19 +221,19 @@ async def step(env):
     hero_unit2 = utils2.get_unit(obs, player_id=1)
     
     #print("item_flag1: ", item_flag1)
-    #print("item_flag2: ", item_flag2)
     #print("item_route_index1: ", item_route_index1)
-    #print("item_route_index2: ", item_route_index2)
     #print("item_index1: ", item_index1)
-    #print("item_index2: ", item_index2)
-    #print("len(shadowfiend_item_route[item_route_index1]['item']): ", len(shadowfiend_item_route[item_route_index1]['item']))
-    #print("len(omniknight_item_route[item_route_index2]['item']): ", len(omniknight_item_route[item_route_index2]['item']))
+    #print("len(shadowfiend_item_route): ", len(shadowfiend_item_route))
+    #print("shadowfiend_item_route[item_route_index1 - 1]['gold']: ", shadowfiend_item_route[item_route_index1 - 1]['gold'])
+    #print("len(shadowfiend_item_route[item_route_index1 - 1]['item']): ", len(shadowfiend_item_route[item_route_index1 - 1]['item']))
+    #print("courier_stash_flag1: ", courier_stash_flag1)
+    #print("courier_delivery_flag1: ", courier_delivery_flag1)
     if hero_unit1 != None:
       gold1 = hero_unit1.unreliable_gold + hero_unit1.reliable_gold
+      #print("gold1: ", gold1)
 
     if hero_unit2 != None:
       gold2 = hero_unit2.unreliable_gold + hero_unit2.reliable_gold
-    #print("gold: ", gold)
 
     action_pb_item_and_ability1 = None
     action_pb_item_and_ability2 = None
@@ -238,24 +242,26 @@ async def step(env):
       if hero_unit1.level > prev_level1:
         prev_level1 = hero_unit1.level
         action_pb_item_and_ability1 = utils1.train_ability(hero_unit1, shadowfiend_ability_route[hero_unit1.level - 1], 0)
-        
-        if item_route_index1 <= len(shadowfiend_item_route) - 1:
-          if gold1 >= shadowfiend_item_route[item_route_index1]['gold']:
-            if item_flag1 == False:
-              item_flag1 = True
+      elif item_route_index1 < len(shadowfiend_item_route) and item_flag1 == False:
+        if gold1 >= shadowfiend_item_route[item_route_index1]['gold']:
+          if item_flag1 == False:
+            item_flag1 = True
+
+          item_route_index1 += 1
       elif item_flag1 == True:
-        if item_index1 <= len(shadowfiend_item_route[item_route_index1]['item']) - 1:
-          #print("item_index1: ", item_index1)
-          action_pb_item_and_ability1 = utils1.buy_item(shadowfiend_item_route[item_route_index1]['item'][item_index1], 0)
+        if item_index1 <= len(shadowfiend_item_route[item_route_index1 - 1]['item']) - 1:
+          action_pb_item_and_ability1 = utils1.buy_item(shadowfiend_item_route[item_route_index1 - 1]['item'][item_index1], 0)
           item_index1 += 1
         else:
-          if item_route_index1 != 0:
+          if item_route_index1 - 1 != 0:
             courier_stash_flag1 = True
 
           item_flag1 = False
-          item_route_index1 += 1
+          item_index1 = 0
       elif courier_stash_flag1 == True:
         action_pb_item_and_ability1 = CMsgBotWorldState.Action()
+        action_pb_item_and_ability1.player = 0
+        action_pb_item_and_ability1.actionDelay = 0 
         action_pb_item_and_ability1.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
         action_pb_item_and_ability1.courier.unit = 0 
@@ -266,6 +272,8 @@ async def step(env):
         courier_delivery_flag1 = True
       elif courier_delivery_flag1 == True:
         action_pb_item_and_ability1 = CMsgBotWorldState.Action()
+        action_pb_item_and_ability1.player = 0
+        action_pb_item_and_ability1.actionDelay = 0 
         action_pb_item_and_ability1.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
         action_pb_item_and_ability1.courier.unit = 0 
@@ -277,25 +285,27 @@ async def step(env):
     if hero_unit2 != None:
       if hero_unit2.level > prev_level2:
         prev_level2 = hero_unit2.level
-        action_pb_item_and_ability2 = utils2.train_ability(hero_unit2, omniknight_ability_route[hero_unit2.level - 1], 1)
-        
-        if item_route_index2 <= len(omniknight_item_route) - 1:
-          if gold2 >= omniknight_item_route[item_route_index2]['gold']:
-            if item_flag2 == False:
-              item_flag2 = True
+        action_pb_item_and_ability2 = utils2.train_ability(hero_unit2, omniknight_ability_route[hero_unit2.level - 1], 0)
+      elif item_route_index2 < len(omniknight_item_route) and item_flag2 == False:
+        if gold2 >= omniknight_item_route[item_route_index2]['gold']:
+          if item_flag2 == False:
+            item_flag2 = True
+
+          item_route_index2 += 1
       elif item_flag2 == True:
-        if item_index2 <= len(omniknight_item_route[item_route_index2]['item'])  - 1:
-          action_pb_item_and_ability2 = utils2.buy_item(omniknight_item_route[item_route_index2]['item'][item_index2], 1)
+        if item_index2 <= len(omniknight_item_route[item_route_index2 - 1]['item']) - 1:
+          action_pb_item_and_ability2 = utils2.buy_item(omniknight_item_route[item_route_index2 - 1]['item'][item_index2], 0)
           item_index2 += 1
         else:
-          if item_route_index2 != 0:
+          if item_route_index2 - 1 != 0:
             courier_stash_flag2 = True
 
           item_flag2 = False
-          item_route_index2 += 1
-
+          item_index2 = 0
       elif courier_stash_flag2 == True:
         action_pb_item_and_ability2 = CMsgBotWorldState.Action()
+        action_pb_item_and_ability2.player = 1
+        action_pb_item_and_ability2.actionDelay = 0 
         action_pb_item_and_ability2.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
         action_pb_item_and_ability2.courier.unit = 0 
@@ -306,6 +316,8 @@ async def step(env):
         courier_delivery_flag2 = True
       elif courier_delivery_flag2 == True:
         action_pb_item_and_ability2 = CMsgBotWorldState.Action()
+        action_pb_item_and_ability2.player = 1
+        action_pb_item_and_ability2.actionDelay = 0 
         action_pb_item_and_ability2.actionType = CMsgBotWorldState.Action.Type.Value('ACTION_COURIER')
 
         action_pb_item_and_ability2.courier.unit = 0 
@@ -444,7 +456,7 @@ async def step(env):
       else:
         action_pb2 = action_pb_item_and_ability2
 
-      print("action_pb2: ", action_pb2)
+      #print("action_pb2: ", action_pb2)
 
       hero_location2 = hero_unit2.location
       
