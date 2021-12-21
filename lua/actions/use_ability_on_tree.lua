@@ -25,11 +25,16 @@ end
 -------------------------------------------------
 function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
     --hItem = hUnit:HasItemInInventory("item_tango")
-    local hItem_1 = hUnit:GetItemInSlot(0)
-    --local hItem_2 = hUnit:GetItemInSlot(1)
-    --local hAbility_3 = hUnit:GetAbilityInSlot(9)
-    --print("dump(hItem_1): ", dump(hItem_1))
-    local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    local hAbility
+
+    if intAbilitySlot[1] >= 0 then
+        hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    else
+        itemSlot = -intAbilitySlot[1] - 1
+        --print("dump(itemSlot): ", dump(itemSlot))
+        hAbility = hUnit:GetItemInSlot(itemSlot)
+    end
+
     if not hAbility then
         print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
         do return end
@@ -42,6 +47,7 @@ function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
     -- range, mana/cooldowns or any debuffs on the hUnit (e.g., silenced).
     -- We assume only valid and legal actions are agent selected
     local tableNearbyTrees = hUnit:GetNearbyTrees(500);
+    print("dump(tableNearbyTrees): ", dump(tableNearbyTrees))
     if tableNearbyTrees[1] then
         intTree = tableNearbyTrees[1]
     end
@@ -53,7 +59,7 @@ function UseAbilityOnTree:Call( hUnit, intAbilitySlot, intTree, iType )
     DebugDrawCircle(vLoc, 25, 255, 0, 0)
     DebugDrawLine(hUnit:GetLocation(), vLoc, 255, 0, 0)
 
-    hAbility = hItem_1
+    --hAbility = hItem_1
     --print("dump(hAbility): ", dump(hAbility))
     if iType == nil or iType == ABILITY_STANDARD then
         hUnit:Action_UseAbilityOnTree(hAbility, intTree)

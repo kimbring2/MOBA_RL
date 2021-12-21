@@ -7,6 +7,20 @@ local UseAbilityOnEntity = {}
 UseAbilityOnEntity.Name = "Use Ability On Entity"
 UseAbilityOnEntity.NumArgs = 4
 
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
 -------------------------------------------------
 function UseAbilityOnEntity:Call( hUnit, intAbilitySlot, hTarget, iType )
     hTarget = hTarget[1]
@@ -15,7 +29,15 @@ function UseAbilityOnEntity:Call( hUnit, intAbilitySlot, hTarget, iType )
     end
     hTarget = GetBotByHandle(hTarget)
 
-    local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    local hAbility
+
+    if intAbilitySlot[1] >= 0 then
+        hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
+    else
+        itemSlot = -intAbilitySlot[1] - 1
+        --print("dump(itemSlot): ", dump(itemSlot))
+        hAbility = hUnit:GetItemInSlot(itemSlot)
+    end
     if not hAbility then
         print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
         do return end
