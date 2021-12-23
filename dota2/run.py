@@ -95,16 +95,19 @@ async def reset(env):
 item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
                   'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots',
                   'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_ward_sentry', 'item_bracer',
-                  'item_recipe_magic_wand'
+                  'item_recipe_magic_wand', 'item_recipe_wraith_band', 'item_slippers'
                  ]
+
 
 
 shadowfiend_item_route = [
           {'gold': 0, 'item': ['item_ward_observer', 'item_magic_stick', 'item_tango', 'item_tango']},
           {'gold': 500, 'item': ['item_boots']},
           {'gold': 250, 'item': ['item_branches', 'item_branches', 'item_recipe_magic_wand']},
-          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']}
+          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']},
+          {'gold': 505, 'item': ['item_circlet', 'item_slippers', 'item_recipe_wraith_band']}
         ]
+
 
 
 shadowfiend_ability_route = [
@@ -117,10 +120,11 @@ shadowfiend_ability_route = [
 
 
 omniknight_item_route = [
-          {'gold': 0, 'item': ['item_ward_sentry', 'item_circlet', 'item_clarity', 'item_flask']},
+          {'gold': 0, 'item': ['item_ward_sentry', 'item_circlet', 'item_clarity', 'item_clarity']},
           {'gold': 500, 'item': ['item_boots']},
           {'gold': 350, 'item': ['item_gauntlets', 'item_recipe_bracer']},
-          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']}
+          {'gold': 250, 'item': ['item_clarity', 'item_clarity', 'item_faerie_fire', 'item_faerie_fire']},
+          {'gold': 450, 'item': ['item_magic_wand']}
         ]
 
 
@@ -174,12 +178,12 @@ async def step(env):
       print("done == True")
       if arguments.id == 0:
         if response.status == Status.Value('RADIANT_WIN'):
-          print('RADIANT_WIN')
+          #print('RADIANT_WIN')
           with writer.as_default():
             tf.summary.scalar("reward_sum1", reward_sum1, step=total_step)
             tf.summary.scalar("reward_sum2", reward_sum2, step=total_step)
         elif response.status == Status.Value('DIRE_WIN'):
-          print('DIRE_WIN')
+          #print('DIRE_WIN')
           with writer.as_default():
             tf.summary.scalar("reward_sum1", reward_sum1, step=total_step)
             tf.summary.scalar("reward_sum2", reward_sum2, step=total_step)
@@ -199,10 +203,10 @@ async def step(env):
       print("total_step: ", total_step)
 
     if response.status == Status.Value('RADIANT_WIN'):
-      #print('RADIANT_WIN')
+      print('RADIANT_WIN')
       done = True
     elif response.status == Status.Value('DIRE_WIN'):
-      #print('DIRE_WIN')
+      print('DIRE_WIN')
       done = True
     elif response.status == Status.Value('RESOURCE_EXHAUSTED'):
       print('RESOURCE_EXHAUSTED')
@@ -217,8 +221,8 @@ async def step(env):
     
     env_state = np.array([dota_time_norm, creepwave_sin, team_float])
 
-    hero_unit1 = utils1.get_unit(obs, player_id=0)
-    hero_unit2 = utils2.get_unit(obs, player_id=1)
+    hero_unit1 = utils1.get_unit(obs, team_id=TEAM_RADIANT, player_id=0)
+    hero_unit2 = utils2.get_unit(obs, team_id=TEAM_RADIANT, player_id=1)
     
     #print("item_flag1: ", item_flag1)
     #print("item_route_index1: ", item_route_index1)
@@ -242,7 +246,9 @@ async def step(env):
       if hero_unit1.level > prev_level1:
         prev_level1 = hero_unit1.level
         action_pb_item_and_ability1 = utils1.train_ability(hero_unit1, shadowfiend_ability_route[hero_unit1.level - 1], 0)
-      elif item_route_index1 < len(shadowfiend_item_route) and item_flag1 == False:
+      elif item_route_index1 < len(shadowfiend_item_route) and item_flag1 == False and courier_stash_flag1 == False \
+        and courier_delivery_flag1 == False:
+        #print("elif item_route_index1 < len(shadowfiend_item_route) and item_flag1 == False:")
         if gold1 >= shadowfiend_item_route[item_route_index1]['gold']:
           if item_flag1 == False:
             item_flag1 = True
@@ -253,12 +259,13 @@ async def step(env):
           action_pb_item_and_ability1 = utils1.buy_item(shadowfiend_item_route[item_route_index1 - 1]['item'][item_index1], 0)
           item_index1 += 1
         else:
-          if item_route_index1 - 1 != 0:
-            courier_stash_flag1 = True
+          #if item_route_index1 - 1 != 0:
+          courier_stash_flag1 = True
 
           item_flag1 = False
           item_index1 = 0
       elif courier_stash_flag1 == True:
+        #print("elif courier_stash_flag1 == True:")
         action_pb_item_and_ability1 = CMsgBotWorldState.Action()
         action_pb_item_and_ability1.player = 0
         action_pb_item_and_ability1.actionDelay = 0 
@@ -285,8 +292,9 @@ async def step(env):
     if hero_unit2 != None:
       if hero_unit2.level > prev_level2:
         prev_level2 = hero_unit2.level
-        action_pb_item_and_ability2 = utils2.train_ability(hero_unit2, omniknight_ability_route[hero_unit2.level - 1], 0)
-      elif item_route_index2 < len(omniknight_item_route) and item_flag2 == False:
+        action_pb_item_and_ability2 = utils2.train_ability(hero_unit2, omniknight_ability_route[hero_unit2.level - 1], 1)
+      elif item_route_index2 < len(omniknight_item_route) and item_flag2 == False and courier_stash_flag2 == False \
+        and courier_delivery_flag2 == False:
         if gold2 >= omniknight_item_route[item_route_index2]['gold']:
           if item_flag2 == False:
             item_flag2 = True
@@ -294,11 +302,11 @@ async def step(env):
           item_route_index2 += 1
       elif item_flag2 == True:
         if item_index2 <= len(omniknight_item_route[item_route_index2 - 1]['item']) - 1:
-          action_pb_item_and_ability2 = utils2.buy_item(omniknight_item_route[item_route_index2 - 1]['item'][item_index2], 0)
+          action_pb_item_and_ability2 = utils2.buy_item(omniknight_item_route[item_route_index2 - 1]['item'][item_index2], 1)
           item_index2 += 1
         else:
-          if item_route_index2 - 1 != 0:
-            courier_stash_flag2 = True
+          #if item_route_index2 - 1 != 0:
+          courier_stash_flag2 = True
 
           item_flag2 = False
           item_index2 = 0
@@ -371,11 +379,16 @@ async def step(env):
                                   env_output1, np.array([reward1], dtype=np.float32))
       action_dict1 = {'enum': action1[0], 'x': action1[1], 'y': action1[2], 'target_unit': action1[3], 'ability': action1[4], 'item': action1[5]}
       
+      print("action_pb_item_and_ability1: ", action_pb_item_and_ability1)
       if action_pb_item_and_ability1 == None:
         if response.world_state.dota_time > -70.0:
-          action_pb1 = utils1.action_to_pb(0, action_dict1, response.world_state, unit_handles1)
+          action_pb1 = utils1.action_to_pb(0, TEAM_RADIANT, action_dict1, response.world_state, unit_handles1)
         else:
           action_pb1 = utils1.none_action(0)
+      elif courier_stash_flag1 == True:
+        action_pb1 = action_pb_item_and_ability1
+      elif courier_delivery_flag1 == True:
+        action_pb1 = action_pb_item_and_ability1
       else:
         action_pb1 = action_pb_item_and_ability1
 
@@ -386,7 +399,7 @@ async def step(env):
       actions.append(action_pb1)
 
       try:
-        reward1 = utils1.get_reward(prev_obs, obs, 0)
+        reward1 = utils1.get_reward(prev_obs, TEAM_RADIANT, obs, 0)
         reward1 = sum(reward1.values())
       except:
         reward1 = 0
@@ -450,19 +463,23 @@ async def step(env):
 
       if action_pb_item_and_ability2 == None:
         if response.world_state.dota_time > -70.0:
-          action_pb2 = utils2.action_to_pb(1, action_dict2, response.world_state, unit_handles2)
+          action_pb2 = utils2.action_to_pb(1, TEAM_RADIANT, action_dict2, response.world_state, unit_handles2)
         else:
           action_pb2 = utils2.none_action(1)
+      elif courier_stash_flag2 == True:
+        action_pb2 = action_pb_item_and_ability2
+      elif courier_delivery_flag2 == True:
+        action_pb2 = action_pb_item_and_ability2
       else:
         action_pb2 = action_pb_item_and_ability2
 
-      #print("action_pb2: ", action_pb2)
+      print("action_pb2: ", action_pb2)
 
       hero_location2 = hero_unit2.location
       
       actions.append(action_pb2)
       try:
-        reward2 = utils2.get_reward(prev_obs, obs, 1)
+        reward2 = utils2.get_reward(prev_obs, TEAM_RADIANT, obs, 1)
         reward2 = sum(reward2.values())
       except:
         reward2 = 0

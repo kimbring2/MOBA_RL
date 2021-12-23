@@ -150,7 +150,7 @@ def get_item_id(unit, item_slot):
 item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
                   'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots',
                   'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_ward_sentry', 'item_bracer',
-                  'item_recipe_magic_wand'
+                  'item_recipe_magic_wand', 'item_recipe_wraith_band', 'item_slippers', 'item_wraith_band'
                   ]
 
 def get_item_type(unit, item_slot):
@@ -175,7 +175,10 @@ def get_item_type(unit, item_slot):
     ITEM_FAERIE_FIRE_ID : 0,
     ITEM_RECIPE_BRACER : 4,
     ITEM_WARD_SENTRY_ID : 2,
-    ITEM_RECIPE_MAGIC_STICK_ID : 4
+    ITEM_RECIPE_MAGIC_STICK_ID : 4,
+    ITEM_SLIPPERS : 4,
+    ITEM_WRAITH_BAND : 4,
+    ITEM_RECIPE_WRAITH_BAND : 4
   }
 
   items = unit.items
@@ -230,10 +233,14 @@ ITEM_RECIPE_BRACER = 72
 ITEM_BRACER = 73
 ITEM_BOOTS = 29
 ITEM_FAERIE_FIRE_ID = 237
+ITEM_SLIPPERS = 14
+ITEM_WRAITH_BAND = 75
+ITEM_RECIPE_WRAITH_BAND = 74
 
 ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_WARD_ID, ITEM_TANGO_ID, ITEM_GAUNTLETS_ID,
                 ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS,
-                ITEM_RECIPE_BRACER, ITEM_MANGO_ID, ITEM_WARD_SENTRY_ID, ITEM_FLASK_ID, ITEM_RECIPE_MAGIC_STICK_ID]
+                ITEM_RECIPE_BRACER, ITEM_MANGO_ID, ITEM_WARD_SENTRY_ID, ITEM_FLASK_ID, ITEM_RECIPE_MAGIC_STICK_ID, ITEM_SLIPPERS,
+                ITEM_WRAITH_BAND, ITEM_RECIPE_WRAITH_BAND]
 def get_item_matrix(unit):
   item_dict = {
     ITEM_BRANCH_ID : 0,
@@ -251,7 +258,10 @@ def get_item_matrix(unit):
     ITEM_FLASK_ID : 12,
     ITEM_MANGO_ID : 13,
     ITEM_WARD_SENTRY_ID : 14,
-    ITEM_RECIPE_MAGIC_STICK_ID : 15
+    ITEM_RECIPE_MAGIC_STICK_ID : 15,
+    ITEM_SLIPPERS : 16,
+    ITEM_WRAITH_BAND: 17,
+    ITEM_RECIPE_WRAITH_BAND: 18
   }
 
   item_matrix = np.zeros(len(item_dict))
@@ -296,7 +306,8 @@ def get_ability_matrix(unit):
 # 'magic_wand': ['item_branches', 'item_branches', 'item_recipe_magic_wand']
 # 'bracer': ['item_circlet', 'item_gauntlets', 'item_recipe_bracer']
 #item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
-#                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer',  'item_boots']
+#                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer',  'item_boots',
+#                  'item_recipe_wraith_band', 'item_slippers', 'item_wraith_band']
 '''
 init_item_1 = [
                'item_tango', 'item_tango', 'item_faerie_fire', 'item_clarity', 'item_circlet'
@@ -308,11 +319,11 @@ init_item_2 = [
 '''
 
 init_item_1 = [
-               'item_boots'
+               'item_recipe_wraith_band', 'item_slippers', 'item_circlet'
               ]
 
 init_item_2 = [
-               'item_ward_sentry', 'item_circlet', 'item_flask'
+               'item_ward_sentry', 'item_flask', 'item_flask'
               ]
 
 modifier_name = {
@@ -333,7 +344,9 @@ modifier_name = {
         "modifier_nevermore_shadowraze_counter": 15,
         "modifier_item_ironwood_branch": 16,
         "modifier_omniknight_repel": 17,
-        "modifier_truesight": 18
+        "modifier_truesight": 18,
+        'modifier_item_slippers': 19,
+        'modifier_item_wraith_band': 20
 
     }
 routes = [
@@ -351,11 +364,11 @@ skill_learn_flag1 = True
 skill_learn_flag2 = True
 skill_use_flag1 = False
 skill_use_flag2 = False
-item_buy_flag1 = False
+item_buy_flag1 = True
 item_buy_flag2 = 0
 item_buy_index1 = 0
 item_buy_index2 = len(init_item_2)
-item_use_flag1 = False
+item_use_flag1 = True
 item_use_flag2 = False
 move_flag1 = False
 move_flag2 = False
@@ -365,7 +378,7 @@ tango_flag = False
 mango_flag = False
 flask_flag = False
 faerie_fire_flag = False
-ward_observer_flag = False
+ward_observer_flag = True
 ward_sentry_flag = False
 stick_flag = False
 courier_stash_flag = False
@@ -430,15 +443,18 @@ async def step():
     dota_time = response.world_state.dota_time
     print('response.world_state.dota_time: ', response.world_state.dota_time)
 
-    if dota_time == 369.210205078125:
-      print("dota_time == 369.210205078125")
-      continue
-
     #print('response.world_state.glyph_cooldown: ', response.world_state.glyph_cooldown)
     #print('response.world_state.damage_events: ', response.world_state.damage_events)
-    if response.status == Status.Value('DIRE_WIN') or response.status == Status.Value('RADIANT_WIN'):
-      print('End of Game')
+    if response.status == Status.Value('RADIANT_WIN'):
+      print('RADIANT_WIN')
       break
+    elif response.status == Status.Value('DIRE_WIN'):
+      print('DIRE_WIN')
+      break
+    elif response.status == Status.Value('RESOURCE_EXHAUSTED'):
+      print('RESOURCE_EXHAUSTED')
+      continue
+      #break
 
     hero1_unit = None
     hero2_unit = None
@@ -477,6 +493,7 @@ async def step():
 
     #for player in response.world_state.players:
     #  print("player: ", player)
+
     #print("self_tower_position: ", self_tower_position)
     #print("enemy_tower_position: ", enemy_tower_position)
     
@@ -645,7 +662,7 @@ async def step():
     #print("hero_item: ", hero_item)
     for item in hero1_unit.items:
       #print("item: ", item)
-      #print("item.ability_id: ", item.ability_id)
+      print("item.ability_id: ", item.ability_id)
       #print("item.charges: ", item.charges)
       #print("item.is_activated: ", item.is_activated)
       #print("item.slot: ", item.slot)
@@ -660,7 +677,7 @@ async def step():
 
     if (abs(-900 - hero1_location.x) >= 500) or (abs(-870 - hero1_location.y) >= 500):
       #if item_buy_index1 == len(init_item_1):
-      move_flag1 = True
+      #move_flag1 = True
       #courier_flag = True
       pass
     else:
@@ -683,24 +700,25 @@ async def step():
     c.to_allchat = 1
 
     #print("attack_flag1: ", attack_flag1)
-    print("move_flag1: ", move_flag1)
+    #print("move_flag1: ", move_flag1)
     #print("move_flag2: ", move_flag2)
     #print("item_use_flag: ", item_use_flag)
-    print("item_buy_flag1: ", item_buy_flag1)
-    print("item_buy_index1: ", item_buy_index1)
+    #print("item_buy_flag1: ", item_buy_flag1)
+    #print("item_buy_index1: ", item_buy_index1)
     #print("item_buy_flag2: ", item_buy_flag2)
 
     #action_pb.chat.CopyFrom(t) 
     action_pb1 = CMsgBotWorldState.Action()
     action_pb2 = CMsgBotWorldState.Action()
     #print("skill_use_flag1: ", skill_use_flag1)
-    if dota_time > -90.0:
+    if dota_time > -85.0:
       if item_buy_flag1 == True and item_buy_index1 < len(init_item_1):
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
 
         i = CMsgBotWorldState.Action.PurchaseItem()
         i.item = 1
         i.item_name = init_item_1[item_buy_index1]
+        #print("i.item_name: ", i.item_name)
 
         action_pb1.purchaseItem.CopyFrom(i) 
 
@@ -816,7 +834,7 @@ async def step():
       action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     
 
-    if dota_time > -90.0:
+    if dota_time > -85.0:
       if item_buy_flag2 != len(init_item_2):
         action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_PURCHASE_ITEM')
 

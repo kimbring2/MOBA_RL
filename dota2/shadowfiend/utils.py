@@ -77,10 +77,15 @@ ITEM_RECIPE_BRACER = 72
 ITEM_BRACER = 73
 ITEM_BOOTS = 29
 ITEM_FAERIE_FIRE_ID = 237
+ITEM_SLIPPERS = 14
+ITEM_WRAITH_BAND = 75
+ITEM_RECIPE_WRAITH_BAND = 74
 
 ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_WARD_ID, ITEM_TANGO_ID, ITEM_GAUNTLETS_ID,
                 ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS,
-                ITEM_RECIPE_BRACER, ITEM_MANGO_ID, ITEM_WARD_SENTRY_ID, ITEM_FLASK_ID, ITEM_RECIPE_MAGIC_STICK_ID]
+                ITEM_RECIPE_BRACER, ITEM_MANGO_ID, ITEM_WARD_SENTRY_ID, ITEM_FLASK_ID, ITEM_RECIPE_MAGIC_STICK_ID,
+                ITEM_SLIPPERS, ITEM_WRAITH_BAND, ITEM_RECIPE_WRAITH_BAND
+                ]
 
 def get_player(state, player_id):
     for player in state.players:
@@ -90,11 +95,12 @@ def get_player(state, player_id):
     raise ValueError("hero {} not found in state:\n{}".format(player_id, state))
 
 
-def get_unit(state, player_id):
+def get_unit(state, team_id, player_id):
     for unit in state.units:
-        if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO') \
-            and unit.player_id == player_id:
-            return unit
+        if unit.team_id == team_id:
+            if unit.unit_type == CMsgBotWorldState.UnitType.Value('HERO') \
+                and unit.player_id == player_id:
+                return unit
     
     return None  
     #raise ValueError("unit {} not found in state:\n{}".format(player_id, state))
@@ -285,7 +291,7 @@ def unit_matrix(unit_list, hero_unit, only_self=False, max_units=16):
     # actions relating to output indices. Even if we would, batching multiple sequences together
     # would then be another error prone nightmare.
     handles = np.full(max_units, -1)
-    m = np.zeros((max_units, 29))
+    m = np.zeros((max_units, 32))
     i = 0
     for unit in unit_list:
         if unit.is_alive:
@@ -373,7 +379,10 @@ def get_item_matrix(unit):
     ITEM_FLASK_ID : 12,
     ITEM_MANGO_ID : 13,
     ITEM_WARD_SENTRY_ID : 14,
-    ITEM_RECIPE_MAGIC_STICK_ID : 15
+    ITEM_RECIPE_MAGIC_STICK_ID : 15,
+    ITEM_SLIPPERS : 16,
+    ITEM_WRAITH_BAND: 17,
+    ITEM_RECIPE_WRAITH_BAND: 18
   }
 
   item_matrix = np.zeros(len(item_dict))
@@ -408,7 +417,7 @@ def get_item_slot(unit, item_id, in_equipment=False):
 item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
                   'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer', 'item_boots',
                   'item_faerie_fire', 'item_flask', 'item_enchanted_mango', 'item_ward_sentry', 'item_bracer',
-                  'item_recipe_magic_wand'
+                  'item_recipe_magic_wand', 'item_recipe_wraith_band', 'item_slippers', 'item_wraith_band'
                  ]
 def get_item_type(unit, item_slot):
   # 0: non target
@@ -418,7 +427,7 @@ def get_item_type(unit, item_slot):
   # 4: equipment
   item_dict = {
     ITEM_BRANCH_ID : 2,
-    ITEM_CLARITY_ID : 0,
+    ITEM_CLARITY_ID : 1,
     ITEM_WARD_ID : 2,
     ITEM_TANGO_ID : 3,
     ITEM_GAUNTLETS_ID : 4,
@@ -432,7 +441,10 @@ def get_item_type(unit, item_slot):
     ITEM_FAERIE_FIRE_ID : 0,
     ITEM_RECIPE_BRACER : 4,
     ITEM_WARD_SENTRY_ID : 2,
-    ITEM_RECIPE_MAGIC_STICK_ID : 4
+    ITEM_RECIPE_MAGIC_STICK_ID : 4,
+    ITEM_SLIPPERS : 4,
+    ITEM_WRAITH_BAND : 4,
+    ITEM_RECIPE_WRAITH_BAND : 4
   }
 
   items = unit.items
@@ -506,16 +518,13 @@ def action_masks(player_unit, unit_handles):
   return masks
 
 
-def action_to_pb(unit_id, action_dict, state, unit_handles):
+def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
   # TODO(tzaman): Recrease the scope of this function. Make it a converter only.
-  hero_unit = get_unit(state, player_id=0)
+  hero_unit = get_unit(state, team_id=team_id, player_id=0)
   action_pb = CMsgBotWorldState.Action()
   action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
   action_pb.player = unit_id
   action_enum = action_dict['enum']
-
-  #action_enum = 3 
-  #action_dict['ability'] = 0
 
   hero_location = hero_unit.location
   if action_enum == 0:
@@ -556,7 +565,11 @@ def action_to_pb(unit_id, action_dict, state, unit_handles):
     elif item_type == 1:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
       action_pb.castTarget.abilitySlot = -(action_dict['item'] + 1)
-      action_pb.castTarget.target = hero_unit.handle
+
+      if 'target_unit' in action_dict:
+        action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
+      else:
+        action_pb.castTarget.target = -1
     elif item_type == 2:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
       action_pb.castLocation.abilitySlot = -(action_dict['item'] + 1)
@@ -837,10 +850,10 @@ def get_total_xp(level, xp_needed_to_level):
     return xp_to_reach_level[level] + missing_xp_for_next_level
 
 
-def get_reward(prev_obs, obs, player_id):
+def get_reward(prev_obs, team_id, obs, player_id):
     """Get the reward."""
-    unit_init = get_unit(prev_obs, player_id=player_id)
-    unit = get_unit(obs, player_id=player_id)
+    unit_init = get_unit(prev_obs, team_id=team_id, player_id=player_id)
+    unit = get_unit(obs, team_id=team_id, player_id=player_id)
     player_init = get_player(prev_obs, player_id=player_id)
     player = get_player(obs, player_id=player_id)
 
@@ -886,7 +899,6 @@ def get_reward(prev_obs, obs, player_id):
     #print("reward: ", reward)
     
     return reward
-
 
 MultiHostSettings = collections.namedtuple('MultiHostSettings', 'strategy hosts training_strategy encode decode')
 def init_learner_multi_host(num_training_tpus: int):
