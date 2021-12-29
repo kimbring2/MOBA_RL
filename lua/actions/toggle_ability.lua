@@ -11,6 +11,8 @@ ToggleAbility.NumArgs = 2
 function ToggleAbility:Call( hUnit, intAbilitySlot )
     --local hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
 
+    local hAbility
+
     if intAbilitySlot[1] >= 0 then
         hAbility = hUnit:GetAbilityInSlot(intAbilitySlot[1])
     else
@@ -23,7 +25,8 @@ function ToggleAbility:Call( hUnit, intAbilitySlot )
         print('[ERROR]: ', hUnit:GetUnitName(), " failed to find ability in slot ", intAbilitySlot[1])
         do return end
     end
-    hAbility:ToggleAbility()
+
+    hAbility:ToggleAutoCast()
 end
 -------------------------------------------------
 
