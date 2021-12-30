@@ -76,7 +76,12 @@ In the case of Shadowfiend which has 4 non passive abilities, ability action net
 
 <img src="image/dota2_omniknight_network.png " width="1000">
 
-## 2. Rendering Environment
+## 2. Item and Ability Route
+
+<img src="image/item_buying_route.png " width="800">
+
+
+## 3. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
 Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
@@ -136,7 +141,7 @@ Now, you are ready to train Dota2 with Seed RL just as we did in the Derk game. 
 $ ./run_impala_test.sh
 ```
 
-## 3. Training Environment
+## 4. Training Environment
 Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
 
 You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md).  
