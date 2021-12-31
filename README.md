@@ -26,7 +26,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 8. Seed RL of Google
 9. Ubuntu 20.04
 11. No GPU, 30GB RAM Desktop mini Desktop is used to make multiple Dokcer container of Dotaservice
-11. GPU, 46GB RAM Desktop is used to make the IMPALA RL agent
+11. GPU, 46GB RAM Desktop is used to make the Seed RL agent
 
 # Reference
 1. Seed RL: https://github.com/google-research/seed_rl
