@@ -80,8 +80,10 @@ In the case of Shadowfiend which has 4 non passive abilities, ability action net
 ## 2. Item and Ability Route
 In Dota2, unlike Derk, agent need to obtain items and abilities during the game. I save the names of item and ability in the list and use them in order when the gold and level of hero meet certain conditions because this part is a little difficult to implement using the DRL.
 
+### Item
 <img src="image/item_buying_route.png " width="1000">
 
+### Ability
 <img src="image/ability_learning_route.png " width="1000">
 
 ## 3. Rendering Environment
