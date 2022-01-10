@@ -33,7 +33,7 @@ AgentOutput = collections.namedtuple('AgentOutput', 'enum enum_logits x x_logits
 class Dota(tf.Module):
   """Agent with ResNet, but without LSTM and additional inputs.
 
-  Four blocks instead of three in ImpalaAtariDeep.
+  Four blocks instead of three in ImpalaDotaDeep.
   """
   def __init__(self, enum_parametric_action_distribution, x_parametric_action_distribution, 
                y_parametric_action_distribution, target_unit_parametric_action_distribution,
@@ -148,15 +148,17 @@ class Dota(tf.Module):
     unit_attention = tf.expand_dims(unit_attention, 1)
 
     action_scores_enum = self.affine_head_enum(x)
+    
     action_scores_x = self.affine_move_x(x)
+
     action_scores_y = self.affine_move_y(x)
-    #print("unit_attention.shape: ", unit_attention.shape)
-    #print("unit_embedding.shape: ", unit_embedding.shape)
+
     action_target_unit = tf.linalg.matmul(unit_attention, unit_embedding)
-    #print("action_target_unit.shape b: ", action_target_unit.shape) 
     action_target_unit = tf.squeeze(action_target_unit, 1)
-    #print("action_target_unit.shape a: ", action_target_unit.shape) 
+
     action_ability = self.affine_head_ability(x)
+
+    action_item = self.affine_head_item(x)
 
     baseline = tf.squeeze(self._baseline(x), axis=-1)
 
@@ -173,9 +175,9 @@ class Dota(tf.Module):
     target_unit_logits_list = []
     ability_logits_list = []
     item_logits_list = []
-    for e_l, x_l, y_l, t_l, a_l, e_m, x_m, y_m, t_m, a_m, i_m in zip(tf.unstack(action_scores_enum), 
+    for e_l, x_l, y_l, t_l, a_l, i_l, e_m, x_m, y_m, t_m, a_m, i_m in zip(tf.unstack(action_scores_enum), 
                                          tf.unstack(action_scores_x), tf.unstack(action_scores_y), 
-                                         tf.unstack(action_target_unit), tf.unstack(action_ability), 
+                                         tf.unstack(action_target_unit), tf.unstack(action_ability), tf.unstack(action_item), 
                                          tf.unstack(enum_mask), tf.unstack(x_mask),
                                          tf.unstack(y_mask), tf.unstack(target_unit_mask), 
                                          tf.unstack(ability_mask), tf.unstack(item_mask)):
@@ -184,7 +186,7 @@ class Dota(tf.Module):
                       'y': tf.expand_dims(tf.expand_dims(y_l, 0), 0),
                       'target_unit': tf.expand_dims(tf.expand_dims(t_l, 0), 0),
                       'ability': tf.expand_dims(tf.expand_dims(a_l, 0), 0),
-                      'item': tf.expand_dims(tf.expand_dims(i_m, 0), 0)
+                      'item': tf.expand_dims(tf.expand_dims(i_l, 0), 0)
                      }
       action_masks = {'enum': tf.expand_dims(tf.expand_dims(e_m, 0), 0),
                       'x': tf.expand_dims(tf.expand_dims(x_m, 0), 0),
@@ -194,7 +196,7 @@ class Dota(tf.Module):
                       'item': tf.expand_dims(tf.expand_dims(i_m, 0), 0)
                      }
 
-      action_dict = {'enum': 0, 'x': 0, 'y': 0, 'target_unit': 0, 'ability': 0, 'item': 0}
+      action_dict = {'enum': -1, 'x': -1, 'y': -1, 'target_unit': -1, 'ability': -1, 'item': -1}
       masked_heads_logits = {'enum': heads_logits['enum'], 'x': heads_logits['x'], 
                              'y': heads_logits['y'], 'target_unit': heads_logits['target_unit'], 
                              'ability': heads_logits['ability'], 'item': heads_logits['item']}
@@ -211,13 +213,8 @@ class Dota(tf.Module):
       masked_heads_logits['item'] = tf.convert_to_tensor([[list(repeat(-1.0, heads_logits['item'].shape[2]))]], 
                                                               dtype=tf.float32)
 
-
-      #tf.print("masked_heads_logits b: ", masked_heads_logits)
       action_dict, masked_heads_logits = utils.select_actions(action_dict, heads_logits, 
                                                               action_masks, masked_heads_logits)
-      #tf.print("masked_heads_logits a: ", masked_heads_logits)
-      #tf.print("")
-      #print("masked_heads_logits: ", masked_heads_logits)
       enum_action_list.append(action_dict['enum'])
       x_action_list.append(action_dict['x'])
       y_action_list.append(action_dict['y'])

@@ -85,7 +85,7 @@ ITEM_ID_LIST = [ITEM_BRANCH_ID, ITEM_CLARITY_ID, ITEM_WARD_ID, ITEM_TANGO_ID, IT
                 ITEM_MAGIC_STICK_ID, ITEM_MAGIC_WAND_ID, ITEM_CIRCLET, ITEM_RECIPE_BRACER, ITEM_BRACER, ITEM_BOOTS,
                 ITEM_RECIPE_BRACER, ITEM_MANGO_ID, ITEM_WARD_SENTRY_ID, ITEM_FLASK_ID, ITEM_RECIPE_MAGIC_STICK_ID,
                 ITEM_SLIPPERS, ITEM_WRAITH_BAND, ITEM_RECIPE_WRAITH_BAND
-                ]
+               ]
 
 def get_player(state, player_id):
     for player in state.players:
@@ -520,7 +520,7 @@ def action_masks(player_unit, unit_handles):
 
 def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
   # TODO(tzaman): Recrease the scope of this function. Make it a converter only.
-  hero_unit = get_unit(state, team_id=team_id, player_id=0)
+  hero_unit = get_unit(state, team_id=team_id, player_id=unit_id)
   action_pb = CMsgBotWorldState.Action()
   action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
   action_pb.player = unit_id
@@ -541,11 +541,7 @@ def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
   elif action_enum == 2:
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_ATTACK_TARGET')
     m = CMsgBotWorldState.Action.AttackTarget()
-    if 'target_unit' in action_dict:
-      m.target = unit_handles[action_dict['target_unit']]
-    else:
-      m.target = -1
-
+    m.target = unit_handles[action_dict['target_unit']]
     m.once = False
     action_pb.attackTarget.CopyFrom(m)
   elif action_enum == 3:
@@ -565,11 +561,7 @@ def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
     elif item_type == 1:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
       action_pb.castTarget.abilitySlot = -(action_dict['item'] + 1)
-
-      if 'target_unit' in action_dict:
-        action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
-      else:
-        action_pb.castTarget.target = -1
+      action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
     elif item_type == 2:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
       action_pb.castLocation.abilitySlot = -(action_dict['item'] + 1)
@@ -799,9 +791,19 @@ def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits)
     action_dict['item'], item_masked_probs = sample_item_actions(heads_logits['item'][0], 
                                                                  action_masks['item'][0])
     masked_heads_logits['item'] = item_masked_probs
+
+    action_dict['x'], x_masked_probs = sample_x_actions(heads_logits['x'][0], action_masks['x'][0])
+    action_dict['y'], y_masked_probs = sample_y_actions(heads_logits['y'][0], action_masks['y'][0])
+    masked_heads_logits['x'] = x_masked_probs
+    masked_heads_logits['y'] = y_masked_probs
+
+    action_dict['target_unit'], target_unit_masked_probs = sample_target_unit_actions(heads_logits['target_unit'][0], 
+                                                                                      action_masks['target_unit'][0])
+    masked_heads_logits['target_unit'] = target_unit_masked_probs
   else:
     ValueError("Invalid Action Selection.")
   
+
   return action_dict, masked_heads_logits
 
 
@@ -836,6 +838,20 @@ def none_action(unit_id):
   action_pb.actionDelay = 0 
   action_pb.player = unit_id  
   action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
+
+  return action_pb
+
+
+def use_tp(unit_id):
+  action_pb = CMsgBotWorldState.Action()
+  action_pb.actionDelay = 0 
+  action_pb.player = unit_id
+  action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+
+  action_pb.castLocation.abilitySlot = -16
+  action_pb.castLocation.location.x = -6700
+  action_pb.castLocation.location.y = -6700
+  action_pb.castLocation.location.z = 0
 
   return action_pb
 
@@ -899,6 +915,7 @@ def get_reward(prev_obs, team_id, obs, player_id):
     #print("reward: ", reward)
     
     return reward
+
 
 MultiHostSettings = collections.namedtuple('MultiHostSettings', 'strategy hosts training_strategy encode decode')
 def init_learner_multi_host(num_training_tpus: int):

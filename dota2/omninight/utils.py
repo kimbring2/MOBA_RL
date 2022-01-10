@@ -519,11 +519,9 @@ def action_masks(player_unit, unit_handles):
 
 
 def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
-  if action_dict['target_unit'][0] > 44:
-    print("action_dict['target_unit']: ", action_dict['target_unit'])
-
   # TODO(tzaman): Recrease the scope of this function. Make it a converter only.
-  hero_unit = get_unit(state, team_id=team_id, player_id=1)
+  hero_unit = get_unit(state, team_id=team_id, player_id=unit_id)
+
   action_pb = CMsgBotWorldState.Action()
   action_pb.actionDelay = 0  # action_dict['delay'] * DELAY_ENUM_TO_STEP
   action_pb.player = unit_id
@@ -544,36 +542,24 @@ def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
   elif action_enum == 2:
     action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_ATTACK_TARGET')
     m = CMsgBotWorldState.Action.AttackTarget()
-    if 'target_unit' in action_dict:
-      m.target = unit_handles[action_dict['target_unit']]
-    else:
-      m.target = -1
-
+    m.target = unit_handles[action_dict['target_unit']]
     m.once = False
     action_pb.attackTarget.CopyFrom(m)
   elif action_enum == 3:
     if action_dict['ability'] == 0:
-      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-      action_pb.castTarget.abilitySlot = action_dict['ability']
-
       # purification
-      if 'target_unit' in action_dict:
-        action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
-      else:
-        action_pb.castTarget.target = -1
-    elif action_dict['ability'] == 1:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
       action_pb.castTarget.abilitySlot = action_dict['ability']
-
+      action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
+    elif action_dict['ability'] == 1:
       # repel
-      if 'target_unit' in action_dict:
-        action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
-      else:
-        action_pb.castTarget.target = -1
+      action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
+      action_pb.castTarget.abilitySlot = action_dict['ability']
+      action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
     elif action_dict['ability'] == 2:
+      # guardian Angel
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_NO_TARGET')
-      action_pb.cast.abilitySlot = action_dict['ability']
-
+      action_pb.cast.abilitySlot = 5
   elif action_enum == 4:
     item_type = get_item_type(hero_unit, action_dict['item'])
 
@@ -588,11 +574,7 @@ def action_to_pb(unit_id, team_id, action_dict, state, unit_handles):
     elif item_type == 1:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
       action_pb.castTarget.abilitySlot = -(action_dict['item'] + 1)
-
-      if 'target_unit' in action_dict:
-        action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
-      else:
-        action_pb.castTarget.target = -1
+      action_pb.castTarget.target = unit_handles[action_dict['target_unit']]
     elif item_type == 2:
       action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
       action_pb.castLocation.abilitySlot = -(action_dict['item'] + 1)
@@ -818,10 +800,23 @@ def select_actions(action_dict, heads_logits, action_masks, masked_heads_logits)
     action_dict['ability'], ability_masked_probs = sample_ability_actions(heads_logits['ability'][0], 
                                                                           action_masks['ability'][0])
     masked_heads_logits['ability'] = ability_masked_probs
+
+    action_dict['target_unit'], target_unit_masked_probs = sample_target_unit_actions(heads_logits['target_unit'][0], 
+                                                                                      action_masks['target_unit'][0])
+    masked_heads_logits['target_unit'] = target_unit_masked_probs
   elif action_dict['enum'] == 4:  # Item
     action_dict['item'], item_masked_probs = sample_item_actions(heads_logits['item'][0], 
                                                                  action_masks['item'][0])
     masked_heads_logits['item'] = item_masked_probs
+
+    action_dict['x'], x_masked_probs = sample_x_actions(heads_logits['x'][0], action_masks['x'][0])
+    action_dict['y'], y_masked_probs = sample_y_actions(heads_logits['y'][0], action_masks['y'][0])
+    masked_heads_logits['x'] = x_masked_probs
+    masked_heads_logits['y'] = y_masked_probs
+
+    action_dict['target_unit'], target_unit_masked_probs = sample_target_unit_actions(heads_logits['target_unit'][0], 
+                                                                                      action_masks['target_unit'][0])
+    masked_heads_logits['target_unit'] = target_unit_masked_probs
   else:
     ValueError("Invalid Action Selection.")
   
@@ -863,6 +858,20 @@ def none_action(unit_id):
   return action_pb
 
 
+def use_tp(unit_id):
+  action_pb = CMsgBotWorldState.Action()
+  action_pb.actionDelay = 0 
+  action_pb.player = unit_id
+  action_pb.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+
+  action_pb.castLocation.abilitySlot = -16
+  action_pb.castLocation.location.x = -6700
+  action_pb.castLocation.location.y = -6700
+  action_pb.castLocation.location.z = 0
+
+  return action_pb
+
+
 def get_total_xp(level, xp_needed_to_level):
     if level == 25:
         return xp_to_reach_level[level]
@@ -877,6 +886,10 @@ def get_reward(prev_obs, team_id, obs, player_id):
     """Get the reward."""
     unit_init = get_unit(prev_obs, team_id=team_id, player_id=player_id)
     unit = get_unit(obs, team_id=team_id, player_id=player_id)
+
+    team_unit_init = get_unit(prev_obs, team_id=team_id, player_id=0)
+    team_unit = get_unit(obs, team_id=team_id, player_id=0)
+
     player_init = get_player(prev_obs, player_id=player_id)
     player = get_player(obs, player_id=player_id)
 
@@ -905,13 +918,19 @@ def get_reward(prev_obs, team_id, obs, player_id):
         reward['mana'] = (mana_rel - mana_rel_init) * low_mana_factor * 0.03
         # NOTE: Fully depleting mana costs: (0 - 1) * (1+(1-0)^2) * 0.1 = - 0.2
 
+    if team_unit_init.is_alive and team_unit.is_alive:
+        hp_rel = team_unit.health / team_unit.health_max
+        low_hp_factor = 1. + (1 - hp_rel)**2  # rel=0 -> 3; rel=0 -> 2; rel=0.5->1.25; rel=1 -> 1.
+        hp_rel_init = team_unit_init.health / team_unit_init.health_max
+        reward['team_hp'] = (hp_rel - hp_rel_init) * low_hp_factor * 0.15
+
     # Kill and death rewards
-    reward['kills'] = (player.kills - player_init.kills) * 1.0
+    reward['kills'] = (player.kills - player_init.kills) * 0.25
     reward['death'] = (player.deaths - player_init.deaths) * -1.0
 
     # Last-hit reward
     lh = unit.last_hits - unit_init.last_hits
-    reward['lh'] = lh * 0.5
+    reward['lh'] = lh * 0.15
 
     # Deny reward
     denies = unit.denies - unit_init.denies

@@ -36,6 +36,20 @@ from parametric_distribution import get_parametric_distribution_for_action_space
 
 import tensorflow as tf
 
+from grpclib.client import Channel
+from dotaservice.protos.DotaService_grpc import DotaServiceStub
+from dotaservice.protos.DotaService_pb2 import Actions
+from dotaservice.protos.DotaService_pb2 import GameConfig
+
+from dotaservice.protos.dota_shared_enums_pb2 import DOTA_GAMEMODE_1V1MID
+from dotaservice.protos.DotaService_pb2 import HostMode
+from dotaservice.protos.DotaService_pb2 import ObserveConfig
+from dotaservice.protos.DotaService_pb2 import TEAM_DIRE, TEAM_RADIANT, Hero, HeroPick, HeroControlMode
+from dotaservice.protos.DotaService_pb2 import NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_SNIPER, NPC_DOTA_HERO_OMNIKNIGHT
+from dotaservice.protos.DotaService_pb2 import HERO_CONTROL_MODE_IDLE, HERO_CONTROL_MODE_DEFAULT, HERO_CONTROL_MODE_CONTROLLED
+from dotaservice.protos.DotaService_pb2 import Status
+from dotaservice.protos.dota_gcmessages_common_bot_script_pb2 import CMsgBotWorldState
+
 parser = argparse.ArgumentParser(description='OpenAI Five implementation')
 parser.add_argument('--env_number', type=int, default=1, help='Number of environment')
 parser.add_argument('--train', type=bool, default=True, help='Whether training model or not')
@@ -85,23 +99,44 @@ def compute_loss(logger, enum_parametric_action_distribution,
   discounting = 0.99
   discounts = tf.cast(~done, tf.float32) * discounting
 
-  enum_target_action_log_probs = enum_parametric_action_distribution.log_prob(learner_outputs.enum_logits, agent_outputs.enum)
-  enum_behaviour_action_log_probs = enum_parametric_action_distribution.log_prob(agent_outputs.enum_logits, agent_outputs.enum)
+  enum = tf.maximum(agent_outputs.enum, 0)
+  enum_target_action_log_probs = enum_parametric_action_distribution.log_prob(learner_outputs.enum_logits, enum)
+  enum_behaviour_action_log_probs = enum_parametric_action_distribution.log_prob(agent_outputs.enum_logits, enum)
 
-  x_target_action_log_probs = x_parametric_action_distribution.log_prob(learner_outputs.x_logits, agent_outputs.x)
-  x_behaviour_action_log_probs = x_parametric_action_distribution.log_prob(agent_outputs.x_logits, agent_outputs.x)
+  x = tf.maximum(agent_outputs.x, 0)
+  x_target_action_log_probs = x_parametric_action_distribution.log_prob(learner_outputs.x_logits, x)
+  x_behaviour_action_log_probs = x_parametric_action_distribution.log_prob(agent_outputs.x_logits, x)
+  x_mask = tf.cast(tf.not_equal(agent_outputs.x, -1), 'float32')
+  x_target_action_log_probs *= x_mask
+  x_behaviour_action_log_probs *= x_mask
 
-  y_target_action_log_probs = y_parametric_action_distribution.log_prob(learner_outputs.y_logits, agent_outputs.y)
-  y_behaviour_action_log_probs = y_parametric_action_distribution.log_prob(agent_outputs.y_logits, agent_outputs.y)
+  y = tf.maximum(agent_outputs.y, 0)
+  y_target_action_log_probs = y_parametric_action_distribution.log_prob(learner_outputs.y_logits, y)
+  y_behaviour_action_log_probs = y_parametric_action_distribution.log_prob(agent_outputs.y_logits, y)
+  y_mask = tf.cast(tf.not_equal(agent_outputs.y, -1), 'float32')
+  y_target_action_log_probs *= y_mask
+  y_behaviour_action_log_probs *= y_mask
 
-  target_unit_target_action_log_probs = target_unit_parametric_action_distribution.log_prob(learner_outputs.target_unit_logits, agent_outputs.target_unit)
-  target_unit_behaviour_action_log_probs = target_unit_parametric_action_distribution.log_prob(agent_outputs.target_unit_logits, agent_outputs.target_unit)
+  target_unit = tf.maximum(agent_outputs.target_unit, 0)
+  target_unit_target_action_log_probs = target_unit_parametric_action_distribution.log_prob(learner_outputs.target_unit_logits, target_unit)
+  target_unit_behaviour_action_log_probs = target_unit_parametric_action_distribution.log_prob(agent_outputs.target_unit_logits, target_unit)
+  target_unit_mask = tf.cast(tf.not_equal(agent_outputs.target_unit, -1), 'float32')
+  target_unit_target_action_log_probs *= target_unit_mask
+  target_unit_behaviour_action_log_probs *= target_unit_mask
 
-  ability_target_action_log_probs = ability_parametric_action_distribution.log_prob(learner_outputs.ability_logits, agent_outputs.ability)
-  ability_behaviour_action_log_probs = ability_parametric_action_distribution.log_prob(agent_outputs.ability_logits, agent_outputs.ability)
+  ability = tf.maximum(agent_outputs.ability, 0)
+  ability_target_action_log_probs = ability_parametric_action_distribution.log_prob(learner_outputs.ability_logits, ability)
+  ability_behaviour_action_log_probs = ability_parametric_action_distribution.log_prob(agent_outputs.ability_logits, ability)
+  ability_mask = tf.cast(tf.not_equal(agent_outputs.ability, -1), 'float32')
+  ability_target_action_log_probs *= ability_mask
+  ability_behaviour_action_log_probs *= ability_mask
 
-  item_target_action_log_probs = item_parametric_action_distribution.log_prob(learner_outputs.item_logits, agent_outputs.item)
-  item_behaviour_action_log_probs = item_parametric_action_distribution.log_prob(agent_outputs.item_logits, agent_outputs.item)
+  item = tf.maximum(agent_outputs.item, 0)
+  item_target_action_log_probs = item_parametric_action_distribution.log_prob(learner_outputs.item_logits, item)
+  item_behaviour_action_log_probs = item_parametric_action_distribution.log_prob(agent_outputs.item_logits, item)
+  item_mask = tf.cast(tf.not_equal(agent_outputs.item, -1), 'float32')
+  item_target_action_log_probs *= item_mask
+  item_behaviour_action_log_probs *= item_mask
 
   # Compute V-trace returns and weights.
   lambda_ = 1.0
@@ -330,8 +365,8 @@ def learner_loop():
       agent.entropy_cost = lambda: tf.exp(mul * agent.entropy_cost_param)
 
     # Create optimizer.
-    batch_size = 4
-    unroll_length = 50
+    batch_size = 2
+    unroll_length = 10
     num_action_repeats = 1
     total_environment_frames = int(1e9)
     iter_frame_ratio = (batch_size * unroll_length * num_action_repeats)

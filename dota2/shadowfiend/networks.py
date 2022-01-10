@@ -153,6 +153,7 @@ class Dota(tf.Module):
     action_target_unit = tf.linalg.matmul(unit_attention, unit_embedding)   
     action_target_unit = tf.squeeze(action_target_unit, 1)  
     action_ability = self.affine_head_ability(x)
+    action_item = self.affine_head_item(x)
 
     baseline = tf.squeeze(self._baseline(x), axis=-1)
 
@@ -169,9 +170,9 @@ class Dota(tf.Module):
     target_unit_logits_list = []
     ability_logits_list = []
     item_logits_list = []
-    for e_l, x_l, y_l, t_l, a_l, e_m, x_m, y_m, t_m, a_m, i_m in zip(tf.unstack(action_scores_enum), 
+    for e_l, x_l, y_l, t_l, a_l, i_l, e_m, x_m, y_m, t_m, a_m, i_m in zip(tf.unstack(action_scores_enum), 
                                          tf.unstack(action_scores_x), tf.unstack(action_scores_y), 
-                                         tf.unstack(action_target_unit), tf.unstack(action_ability), 
+                                         tf.unstack(action_target_unit), tf.unstack(action_ability), tf.unstack(action_item), 
                                          tf.unstack(enum_mask), tf.unstack(x_mask),
                                          tf.unstack(y_mask), tf.unstack(target_unit_mask), 
                                          tf.unstack(ability_mask), tf.unstack(item_mask)):
@@ -180,7 +181,7 @@ class Dota(tf.Module):
                       'y': tf.expand_dims(tf.expand_dims(y_l, 0), 0),
                       'target_unit': tf.expand_dims(tf.expand_dims(t_l, 0), 0),
                       'ability': tf.expand_dims(tf.expand_dims(a_l, 0), 0),
-                      'item': tf.expand_dims(tf.expand_dims(i_m, 0), 0)
+                      'item': tf.expand_dims(tf.expand_dims(i_l, 0), 0)
                      }
       action_masks = {'enum': tf.expand_dims(tf.expand_dims(e_m, 0), 0),
                       'x': tf.expand_dims(tf.expand_dims(x_m, 0), 0),
@@ -190,7 +191,7 @@ class Dota(tf.Module):
                       'item': tf.expand_dims(tf.expand_dims(i_m, 0), 0)
                      }
 
-      action_dict = {'enum': 0, 'x': 0, 'y': 0, 'target_unit': 0, 'ability': 0, 'item': 0}
+      action_dict = {'enum': -1, 'x': -1, 'y': -1, 'target_unit': -1, 'ability': -1, 'item': -1}
       masked_heads_logits = {'enum': heads_logits['enum'], 'x': heads_logits['x'], 
                              'y': heads_logits['y'], 'target_unit': heads_logits['target_unit'], 
                              'ability': heads_logits['ability'], 'item': heads_logits['item']}
