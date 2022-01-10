@@ -181,6 +181,12 @@ tensorboard --host 0.0.0.0 --logdir=./tensorboard
 ```
 
 ### Training Result
+You can check the training result by using below command.
+
+```
+$ ./run_impala_test.sh
+```
+
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
 <img src="image/dota2_train_middle.png " width="700">
