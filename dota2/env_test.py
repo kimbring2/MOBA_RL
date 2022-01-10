@@ -7,7 +7,7 @@ from dotaservice.protos.dota_shared_enums_pb2 import DOTA_GAMEMODE_1V1MID, DOTA_
 from dotaservice.protos.DotaService_pb2 import HostMode
 from dotaservice.protos.DotaService_pb2 import ObserveConfig
 from dotaservice.protos.DotaService_pb2 import TEAM_DIRE, TEAM_RADIANT, Hero, HeroPick, HeroControlMode
-from dotaservice.protos.DotaService_pb2 import NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_SNIPER, NPC_DOTA_HERO_OMNIKNIGHT
+from dotaservice.protos.DotaService_pb2 import NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_OMNIKNIGHT, NPC_DOTA_HERO_DROW_RANGER, NPC_DOTA_HERO_SNIPER
 from dotaservice.protos.DotaService_pb2 import HERO_CONTROL_MODE_IDLE, HERO_CONTROL_MODE_DEFAULT, HERO_CONTROL_MODE_CONTROLLED
 from dotaservice.protos.DotaService_pb2 import Status
 from dotaservice.protos.dota_gcmessages_common_bot_script_pb2 import CMsgBotWorldState
@@ -35,6 +35,9 @@ if render == True:
   HOST_MODE = HostMode.Value('HOST_MODE_GUI')
 else:
   HOST_MODE = HostMode.Value('HOST_MODE_DEDICATED')
+
+
+# NPC_DOTA_HERO_NEVERMORE, NPC_DOTA_HERO_OMNIKNIGHT, NPC_DOTA_HERO_DROW_RANGER
 
 modes = [HERO_CONTROL_MODE_CONTROLLED, HERO_CONTROL_MODE_DEFAULT]
 hero_picks = [
@@ -307,7 +310,7 @@ def get_ability_matrix(unit):
 # 'bracer': ['item_circlet', 'item_gauntlets', 'item_recipe_bracer']
 #item_name_list = ['item_branches', 'item_clarity', 'item_ward_observer', 'item_tango', 'item_gauntlets', 
 #                  'item_magic_stick', 'item_magic_wand', 'item_circlet', 'item_recipe_bracer',  'item_boots',
-#                  'item_recipe_wraith_band', 'item_slippers', 'item_wraith_band']
+#                  'item_recipe_wraith_band', 'item_slippers', 'item_wraith_band', 'item_tpscroll']
 '''
 init_item_1 = [
                'item_tango', 'item_tango', 'item_faerie_fire', 'item_clarity', 'item_circlet'
@@ -319,7 +322,7 @@ init_item_2 = [
 '''
 
 init_item_1 = [
-               'item_recipe_wraith_band', 'item_slippers', 'item_circlet'
+               'item_tpscroll', 'item_slippers', 'item_circlet'
               ]
 
 init_item_2 = [
@@ -346,7 +349,8 @@ modifier_name = {
         "modifier_omniknight_repel": 17,
         "modifier_truesight": 18,
         'modifier_item_slippers': 19,
-        'modifier_item_wraith_band': 20
+        'modifier_item_wraith_band': 20,
+        'modifier_drow_ranger_frost_arrows': 21
 
     }
 routes = [
@@ -354,7 +358,7 @@ routes = [
         'nevermore_shadowraze1', 'nevermore_necromastery', 'nevermore_shadowraze1', 'nevermore_necromastery',
         'nevermore_dark_lord', 'special_bonus_spell_amplify_8', 'nevermore_requiem', 'nevermore_dark_lord',
         'nevermore_dark_lord', 'nevermore_dark_lord', 'special_bonus_unique_nevermore_3', 'nevermore_requiem',
-        'nevermore_requiem', 'special_bonus_unique_nevermore_1', 'special_bonus_unique_nevermore_5'
+        'nevermore_requiem', 'special_bonus_unique_nevermore_1', 'special_bonus_unique_nevermore_5',
     ]
 
 blank_slots = [0, 1, 2, 3, 4, 5]
@@ -363,12 +367,12 @@ blank_slots = [0, 1, 2, 3, 4, 5]
 skill_learn_flag1 = True
 skill_learn_flag2 = True
 skill_use_flag1 = False
-skill_use_flag2 = False
-item_buy_flag1 = True
+skill_use_flag2 = True
+item_buy_flag1 = False
 item_buy_flag2 = 0
 item_buy_index1 = 0
 item_buy_index2 = len(init_item_2)
-item_use_flag1 = True
+item_use_flag1 = False
 item_use_flag2 = False
 move_flag1 = False
 move_flag2 = False
@@ -378,12 +382,13 @@ tango_flag = False
 mango_flag = False
 flask_flag = False
 faerie_fire_flag = False
-ward_observer_flag = True
+ward_observer_flag = False
 ward_sentry_flag = False
 stick_flag = False
 courier_stash_flag = False
 courier_transfer_flag = False
 teleport_flag = False
+toggle_flag = False
 async def step():
   global skill_learn_flag1
   global skill_learn_flag2
@@ -409,6 +414,7 @@ async def step():
   global courier_stash_flag
   global courier_transfer_flag
   global teleport_flag
+  global toggle_flag
 
   creeps = []
   self_creep_min = None
@@ -601,14 +607,14 @@ async def step():
 
     if enermy_hero != None:
       enemey_hero_distance = in_facing_distance(enermy_hero, hero1_unit, 750, r=250, normalization=False)
-      print("enemey_hero_distance: ", enemey_hero_distance)
+      #print("enemey_hero_distance: ", enemey_hero_distance)
       if enemey_hero_distance == 1:
         skill_use_flag1 = True
 
     #print("enemey_creep_min: ", enemey_creep_min)
     if enemey_creep_min != None:
       enemey_creep_distance = in_facing_distance(enemey_creep_min, hero1_unit, 400, r=250, normalization=False)
-      print("enemey_creep_distance: ", enemey_creep_distance)
+      #print("enemey_creep_distance: ", enemey_creep_distance)
       if enemey_creep_distance == 1:
         #skill_use_flag1 = True
         attack_flag1 = True
@@ -630,11 +636,11 @@ async def step():
       #ability_name_type = get_ability_name_type(ability)
       #print("ability_name_type: ", ability_name_type)
 
-      #print("ability: ", ability)
-      #print("ability.ability_id: ", ability.ability_id)
-      #print("ability.slot: ", ability.slot)
+      print("ability: ", ability)
+      print("ability.ability_id: ", ability.ability_id)
+      print("ability.slot: ", ability.slot)
       #print("ability.is_activated: ", ability.is_activated)
-      #print("ability.level: ", ability.level)
+      print("ability.level: ", ability.level)
       #print("ability.cooldown_remaining: ", ability.cooldown_remaining)
       #print("")
       pass
@@ -662,7 +668,7 @@ async def step():
     #print("hero_item: ", hero_item)
     for item in hero1_unit.items:
       #print("item: ", item)
-      print("item.ability_id: ", item.ability_id)
+      #print("item.ability_id: ", item.ability_id)
       #print("item.charges: ", item.charges)
       #print("item.is_activated: ", item.is_activated)
       #print("item.slot: ", item.slot)
@@ -682,12 +688,13 @@ async def step():
       pass
     else:
       if courier_stash_flag == False and courier_transfer_flag == False:
-        item_buy_flag1 = True
+        #item_buy_flag1 = True
         #stick_flag = True
         #item_use_flag = True
         #courier_flag = True
         #item_buy_flag = True
         #teleport_flag = True
+        teleport_flag = True
         pass
 
     if (abs(self_tower.location.x + 300 - hero2_location.x) >= 1000) or (abs(self_tower.location.y + 300 - hero2_location.y) >= 1000):
@@ -699,6 +706,7 @@ async def step():
     c.message = "test"
     c.to_allchat = 1
 
+    #print("teleport_flag: ", teleport_flag)
     #print("attack_flag1: ", attack_flag1)
     #print("move_flag1: ", move_flag1)
     #print("move_flag2: ", move_flag2)
@@ -706,6 +714,7 @@ async def step():
     #print("item_buy_flag1: ", item_buy_flag1)
     #print("item_buy_index1: ", item_buy_index1)
     #print("item_buy_flag2: ", item_buy_flag2)
+    print("toggle_flag: ", toggle_flag)
 
     #action_pb.chat.CopyFrom(t) 
     action_pb1 = CMsgBotWorldState.Action()
@@ -782,7 +791,8 @@ async def step():
           action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
       elif skill_learn_flag1 == True:
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
-        action_pb1.trainAbility.ability = "nevermore_shadowraze1"
+        #action_pb1.trainAbility.ability = "nevermore_shadowraze1"
+        action_pb1.trainAbility.ability = "drow_ranger_frost_arrows"
 
         skill_learn_flag1 = False
       elif move_flag1 == True:
@@ -820,7 +830,7 @@ async def step():
         action_pb1.courier.courier = 0
         action_pb1.courier.action = 6
         courier_transfer_flag = False
-      elif teleport_flag == True and dota_time > 20.0:
+      elif teleport_flag == True:
         action_pb1.actionDelay = 0 
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
 
@@ -828,6 +838,15 @@ async def step():
         action_pb1.castLocation.location.x = -6700
         action_pb1.castLocation.location.y = -6700
         action_pb1.castLocation.location.z = 0
+
+        teleport_flag = False
+      elif toggle_flag == True:
+        action_pb1.actionDelay = 0 
+        action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TOGGLE')
+
+        action_pb1.castToggle.abilitySlot = 0
+
+        #toggle_flag = False
       else:
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_NONE')
     else:
@@ -859,12 +878,19 @@ async def step():
       elif skill_learn_flag2 == True:
         action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
         #action_pb2.trainAbility.ability = "omniknight_purification"
-        action_pb2.trainAbility.ability = "omniknight_repel"
+        action_pb2.trainAbility.ability = "drow_ranger_wave_of_silence"
         skill_learn_flag2 = False
       elif skill_use_flag2 == True:
-        action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
-        action_pb2.castTarget.abilitySlot = 1
-        action_pb2.castTarget.target = hero1_unit.handle
+        #action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_TARGET')
+        #action_pb2.castTarget.abilitySlot = 1
+        #action_pb2.castTarget.target = hero1_unit.handle
+
+        action_pb2.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_CAST_POSITION')
+        action_pb2.castLocation.abilitySlot = 1
+        action_pb2.castLocation.location.x = hero2_location.x + 600
+        action_pb2.castLocation.location.y = hero2_location.y + 600
+        action_pb2.castLocation.location.z = 0
+
         skill_use_flag2 = False
       elif move_flag2 == True:
         action_pb2.actionDelay = 0
