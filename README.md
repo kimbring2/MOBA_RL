@@ -146,6 +146,8 @@ Now, you are ready to train Dota2 with Seed RL just as we did in the Derk game. 
 $ ./run_impala_test.sh
 ```
 
+It will take few minute to load Tensorflow model.
+
 ## 4. Training Environment
 Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
 
