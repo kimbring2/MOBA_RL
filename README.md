@@ -189,11 +189,11 @@ $ ./run_impala_test.sh
 
 In the case of 1V1MID game mode, which is the most basic type, you can confirm that training was done properly based on the reward graph.
 
-<img src="image/dota2_train_middle.png " width="700">
+<img src="image/dota2_train_1vs1.png " width="700">
 
 On the rendering PC, you can check the training result better than the graph as shown in the video below. The heros learns how to move to battle point and attack enermy.
 
-[![Dota2 Hero Demo](https://i3.ytimg.com/vi/mHqGHqfrU40/hqdefault.jpg)](https://www.youtube.com/watch?v=mHqGHqfrU40 "Dota2 single hero training video - Click to Watch!")
+[![Dota2 Hero Demo](https://img.youtube.com/vi/DPdKy8P2Sz8/sddefault.jpg)](https://www.youtube.com/watch?v=DPdKy8P2Sz8 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
  
 # Detailed information
