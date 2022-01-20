@@ -88,7 +88,7 @@ In Dota2, unlike Derk, agent need to obtain items and abilities during the game.
 <img src="image/ability_learning_route.png " width="1000">
 
 ## 3. Reward Setting
-Reward for Reinforcement Learning is basically aimed at acquiring XP. Additionally, agents for giving a damage to enermy unit and recovery to home units have different weights for Last Hit.
+Reward for Reinforcement Learning is basically aimed at acquiring XP. Additionally, agents for giving a damage to enemy unit and recovery to home units have different weights for Last Hit.
 
 <img src="image/reward_setting.png " width="1000">
 
