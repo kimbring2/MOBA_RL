@@ -8,8 +8,9 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 - [Dota2 Environment](#dota2-environment)
   * [1. Network Architecture](#1-network-architecture)
   * [2. Item and Ability Route](#2-item-and-ability-route)
-  * [3. Rendering Environment](#3-rendering-environment)
-  * [4. Training Environment](#4-training-environment)
+  * [3. Reward Setting](#3-reward-setting)
+  * [4. Rendering Environment](#4-rendering-environment)
+  * [5. Training Environment](#5-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
 - [Detailed Information](#detailed-information)
@@ -86,7 +87,10 @@ In Dota2, unlike Derk, agent need to obtain items and abilities during the game.
 ### Ability
 <img src="image/ability_learning_route.png " width="1000">
 
-## 3. Rendering Environment
+## 3. Reward Setting
+<img src="image/reward_setting.png " width="1000">
+
+## 4. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
 Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
@@ -148,7 +152,7 @@ $ ./run_impala_test.sh
 
 It will take few minute to load Tensorflow model.
 
-## 4. Training Environment
+## 5. Training Environment
 Unlike Derk game, each Dotaservice occupies more than 1GB of memory. Therefore, it is good to run them separately on a mini PC without a GPU. Then, Learner and Actor of IMPALA RL need to be ran on a PC with a GPU.
 
 You need to build the Docker image of Dotaservice mentioned in [README](https://github.com/TimZaman/dotaservice/blob/master/docker/README.md).  
