@@ -88,7 +88,11 @@ In Dota2, unlike Derk, agent need to obtain items and abilities during the game.
 <img src="image/ability_learning_route.png " width="1000">
 
 ## 3. Reward Setting
+Reward for Reinforcement Learning is basically aimed at acquiring XP. Additionally, agents for giving a damage to enermy unit and recovery to home units have different weights for Last Hit.
+
 <img src="image/reward_setting.png " width="1000">
+
+Finally, huge reward is given according to result of the game to set the long term strategy during the whole game.
 
 ## 4. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
