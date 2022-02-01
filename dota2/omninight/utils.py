@@ -456,6 +456,7 @@ def get_item_type(unit, item_slot):
 
   return None
 
+
 def ability_available(ability):
   return ability.is_activated and ability.level > 0 and ability.cooldown_remaining == 0 \
       and ability.is_fully_castable
