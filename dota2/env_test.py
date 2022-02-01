@@ -354,7 +354,7 @@ modifier_name = {
 
     }
 routes = [
-        'nevermore_necromastery', 'nevermore_shadowraze1', 'nevermore_shadowraze1', 'nevermore_necromastery',
+        'nevermore_dark_lord', 'nevermore_shadowraze1', 'nevermore_shadowraze1', 'nevermore_necromastery',
         'nevermore_shadowraze1', 'nevermore_necromastery', 'nevermore_shadowraze1', 'nevermore_necromastery',
         'nevermore_dark_lord', 'special_bonus_spell_amplify_8', 'nevermore_requiem', 'nevermore_dark_lord',
         'nevermore_dark_lord', 'nevermore_dark_lord', 'special_bonus_unique_nevermore_3', 'nevermore_requiem',
@@ -714,7 +714,7 @@ async def step():
     #print("item_buy_flag1: ", item_buy_flag1)
     #print("item_buy_index1: ", item_buy_index1)
     #print("item_buy_flag2: ", item_buy_flag2)
-    print("toggle_flag: ", toggle_flag)
+    #print("toggle_flag: ", toggle_flag)
 
     #action_pb.chat.CopyFrom(t) 
     action_pb1 = CMsgBotWorldState.Action()
@@ -792,7 +792,8 @@ async def step():
       elif skill_learn_flag1 == True:
         action_pb1.actionType = CMsgBotWorldState.Action.Type.Value('DOTA_UNIT_ORDER_TRAIN_ABILITY')
         #action_pb1.trainAbility.ability = "nevermore_shadowraze1"
-        action_pb1.trainAbility.ability = "drow_ranger_frost_arrows"
+        #action_pb1.trainAbility.ability = "drow_ranger_frost_arrows"
+        action_pb1.trainAbility.ability = "nevermore_dark_lord"
 
         skill_learn_flag1 = False
       elif move_flag1 == True:
