@@ -211,7 +211,15 @@ On the rendering PC, you can check the training result better than the graph as 
 <strong>Click to Watch!</strong>
 
 ## 6. Replay Parsing and Watching
-Move to [folder](https://github.com/kimbring2/MOBA_RL/tree/main/dota2_replay) of this repository. Run below command to start the replay parsing.
+When you run the Dota2 client using below command, it automatically saves the replay file. Path can be different based on your Steam setting. Please find 'run.sh', 'dota.sh' file and add '+tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1' argument.
+
+```
+$ /home/kimbring2/.steam/debian-installation/ubuntu12_32/steam-runtime/run.sh /home/kimbring2/.steam/debian-installation/steamapps/common/dota_old/game/dota.sh +tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1
+```
+
+We can parse the information about Hero, NPC, Building from that replay file using the Google Protobuf protocol. 
+
+For that, move to [folder](https://github.com/kimbring2/MOBA_RL/tree/main/dota2_replay) of this repository. Run below command to start the replay parsing.
 
 ```
 $ python parser.py [Dota2 Dem file Path]
