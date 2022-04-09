@@ -210,7 +210,7 @@ On the rendering PC, you can check the training result better than the graph as 
 [![Dota2 Hero Demo](https://img.youtube.com/vi/DPdKy8P2Sz8/sddefault.jpg)](https://www.youtube.com/watch?v=DPdKy8P2Sz8 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
-### Replay Parsing and Watching
+## 6. Replay Parsing and Watching
 Move to [folder](https://github.com/kimbring2/MOBA_RL/tree/main/dota2_replay) of this repository. Run below command to start the replay parsing.
 
 ```
