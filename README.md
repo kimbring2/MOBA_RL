@@ -220,6 +220,8 @@ Program will show the replay information screen where you can select each hero a
 [![Dota2 Replay Watching](https://img.youtube.com/vi/JvG_AsEDzEE/sddefault.jpg)](https://youtu.be/JvG_AsEDzEE "Dota2 Replay Processing video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
+This infomation will be used to train the Agent by Supervised Learning method.
+
 # Detailed information
 I am writing explanation for code at Medium as series.
 
