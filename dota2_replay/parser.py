@@ -20,11 +20,13 @@ import pygame
 import threading
 from threading import Thread, Lock
 
-from dota2py import messages
-from dota2py.proto import demo_pb2, netmessages_pb2, dota_shared_enums_pb2, usermessages_pb2
-
 import rendering, utils
-import json
+import messages
+#from proto import demo_pb2
+from proto import demo_pb2
+from proto import netmessages_pb2
+from proto import dota_shared_enums_pb2
+from proto import usermessages_pb2
  
 # Opening JSON file
 with open('data.json') as json_file:
@@ -1336,7 +1338,7 @@ class DemoParser(object):
                 self.tick = tick
 
                 #print("tick: ", tick)
-                #print("cmd 1: ", cmd)
+                print("cmd 1: ", cmd)
 
                 if message_type == demo_pb2.CDemoSendTables:
                     #print("demo_pb2.CDemoSendTables")

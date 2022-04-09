@@ -2,8 +2,8 @@
 Build mappings between ENUMs and actual message types automatically
 """
 
-from dota2py.proto import demo_pb2, netmessages_pb2, usermessages_pb2
-from dota2py.proto import dota_usermessages_pb2, dota_shared_enums_pb2
+from proto import demo_pb2, netmessages_pb2, usermessages_pb2
+from proto import dota_usermessages_pb2, dota_shared_enums_pb2
 
 
 def build_mapping(module, enum_prefix, class_prefix, special_cases=None):
