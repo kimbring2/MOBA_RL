@@ -13,7 +13,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [5. Training Environment](#5-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
-- Replay Parsing and Watching](#replay-parsing-and-watching)
+- [Replay Parsing and Watching](#replay-parsing-and-watching)
 - [Detailed Information](#detailed-information)
 - [License](#license)
 
