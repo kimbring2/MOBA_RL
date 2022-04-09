@@ -101,7 +101,7 @@ Finally, huge reward is given according to result of the game to set the long te
 ## 4. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
-Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version](https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
+Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version]C from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
 
 Next, you need to download and install [dotaservice](https://github.com/TimZaman/dotaservice). In my case, I should modity the _run_dota function of [dotaservice.py](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/dotaservice.py) like below.
 
@@ -211,9 +211,11 @@ On the rendering PC, you can check the training result better than the graph as 
 <strong>Click to Watch!</strong>
 
 ## 6. Replay Parsing and Watching
-When you run the Dota2 client using below command, it automatically saves the replay file. Path can be different based on your Steam setting. Please find 'run.sh', 'dota.sh' file and add '+tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1' argument.
+When you run the Dota2 client using below command, it automatically saves [the replay files](https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing). The path can be different based on your Steam setting. That code only work with Dota2 client that is uploaded to my Google Drive.
 
 ```
+$ [your run.sh file path]/run.sh [your dota.sh file path]/run.sh +tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1
+
 $ /home/kimbring2/.steam/debian-installation/ubuntu12_32/steam-runtime/run.sh /home/kimbring2/.steam/debian-installation/steamapps/common/dota_old/game/dota.sh +tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1
 ```
 
