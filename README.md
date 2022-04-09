@@ -13,6 +13,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
   * [5. Training Environment](#5-training-environment)
     + [Single Hero Training Result](#single-hero-training-result)
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
+- Replay Parsing and Watching](#replay-parsing-and-watching)
 - [Detailed Information](#detailed-information)
 - [License](#license)
 
@@ -205,7 +206,20 @@ On the rendering PC, you can check the training result better than the graph as 
 
 [![Dota2 Hero Demo](https://img.youtube.com/vi/DPdKy8P2Sz8/sddefault.jpg)](https://www.youtube.com/watch?v=DPdKy8P2Sz8 "Dota2 single hero training video - Click to Watch!")
 <strong>Click to Watch!</strong>
- 
+
+# Replay Parsing and Watching
+Move to [folder](https://github.com/kimbring2/MOBA_RL/tree/main/dota2_replay) of this repository. Run below command to start the replay parsing.
+
+```
+$ python parser.py [Dota2 Dem file Path]
+$ python parser.py replay/auto-20220409-1106-start-kimbring2.dem
+```
+
+Program will show the replay information screen where you can select each hero and check the ability and item of them. Additionall, you can move the screen by clicking the minimap or pushing the directional keys of keyboard. 
+
+[![Dota2 Replay Watching](https://img.youtube.com/vi/JvG_AsEDzEE/sddefault.jpg)](https://youtu.be/JvG_AsEDzEE "Dota2 Replay Processing video - Click to Watch!")
+<strong>Click to Watch!</strong>
+
 # Detailed information
 I am writing explanation for code at Medium as series.
 
