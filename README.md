@@ -36,6 +36,9 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 3. Dotaservice: https://github.com/TimZaman/dotaservice
 4. Dotaclient: https://github.com/TimZaman/dotaclient
 5. LastOrder-Dota2: https://github.com/bilibili/LastOrder-Dota2
+6. ReDota: https://github.com/timkurvers/redota
+7. Manta: https://github.com/dotabuff/manta
+8. Clarity: https://github.com/skadistats/clarity
 
 # Derk Environment
 We are going to train small MOBA environment called [Derk](https://gym.derkgame.com/).
