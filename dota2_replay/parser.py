@@ -1,7 +1,7 @@
 from io import StringIO
 from io import BytesIO
-import argparse
 
+import argparse
 import copy
 import six
 import struct
@@ -10,7 +10,6 @@ import functools
 import os
 import time
 import math
-from dataclasses import dataclass
 import ctypes
 import json
 import re
@@ -22,7 +21,7 @@ from threading import Thread, Lock
 
 import rendering, utils
 import messages
-#from proto import demo_pb2
+
 from proto import demo_pb2
 from proto import netmessages_pb2
 from proto import dota_shared_enums_pb2
