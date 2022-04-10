@@ -25,10 +25,15 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
 5. Tensorflow 2.4.1
 6. TensorFlow Probability 0.11.0
 7. Dotaservice of TimZaman
-8. Seed RL of Google
-9. Ubuntu 20.04
-11. No GPU, 30GB RAM Desktop mini Desktop is used to make multiple Dokcer container of Dotaservice
-11. GPU, 46GB RAM Desktop is used to make the Seed RL agent
+8. Google Protobuf 3.19.1
+9. Pygame 1.9.6
+10. OpenCV-Python 4.5.4.60
+11. Six 1.15.0
+12. Snappy 1.1.2
+13. Seed RL of Google
+14. Ubuntu 20.04
+15. No GPU, 30GB RAM Desktop mini Desktop is used to make multiple Dokcer container of Dotaservice
+16. GPU, 46GB RAM Desktop is used to make the Seed RL agent
 
 # Reference
 1. Seed RL: https://github.com/google-research/seed_rl
