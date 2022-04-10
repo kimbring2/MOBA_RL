@@ -214,7 +214,7 @@ On the rendering PC, you can check the training result better than the graph as 
 ## 6. Replay Parsing and Watching
 When you run the Dota2 client using below command, it automatically saves the replay files. The path can be different based on your Steam setting. That code only work with Dota2 client that is uploaded to my Google Drive.
 
-I collect the [replay data]((https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing) of ShadowFiend pf myself at 5:5 game mode with medium level bots.  
+I collect the [replay data](https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing) of ShadowFiend pf myself at 5:5 game mode with medium level bots.  
 
 ```
 $ [your run.sh file path]/run.sh [your dota.sh file path]/run.sh +tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1
