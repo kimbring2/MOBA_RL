@@ -219,7 +219,7 @@ On the rendering PC, you can check the training result better than the graph as 
 ## 6. Replay Parsing and Watching
 When you run the Dota2 client using below command, it automatically saves the replay files. The path can be different based on your Steam setting. 
 
-<img src="image/dota2_replay_parsing_diagram.png " width="700">
+<img src="image/dota2_replay_parsing_diagram.png " width="900">
 
 I collect the [replay data](https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing) of ShadowFiend pf myself at 5:5 game mode with medium level bots.  
 
