@@ -242,7 +242,7 @@ That code only work with Dota2 client that is uploaded to my Google Drive now.
 
 Program will show the replay information screen where you can select each hero and check the ability and item of them. Additionall, you can move the screen by clicking the minimap or pushing the directional keys of keyboard. 
 
-[![Dota2 Replay Watching](https://img.youtube.com/vi/JvG_AsEDzEE/sddefault.jpg)](https://youtu.be/JvG_AsEDzEE "Dota2 Replay Processing video - Click to Watch!")
+[![Dota2 Replay Watching](https://img.youtube.com/vi/tQHnXeVj7HI/sddefault.jpg)](https://www.youtube.com/watch?v=tQHnXeVj7HI "Dota2 Replay Processing video - Click to Watch!")
 <strong>Click to Watch!</strong>
 
 This infomation will be used to train the Agent by Supervised Learning method.
