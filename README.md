@@ -221,7 +221,7 @@ When you run the Dota2 client using below command, it automatically saves the re
 
 <img src="image/dota2_replay_parsing_diagram.png " width="900">
 
-I collect the [replay data](https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing) of ShadowFiend pf myself at 5:5 game mode with medium level bots.  
+I collect the [replay data](https://drive.google.com/drive/folders/17Gwo2EI6EWacKbPIrKiPX1Zxmx2aQboJ?usp=sharing) of ShadowFiend playing of mine at 5:5 game mode with medium level bots.
 
 ```
 $ [your run.sh file path]/run.sh [your dota.sh file path]/run.sh +tv_enable 1 +tv_title test +tv_autorecord 1 +tv_transmitall 1
