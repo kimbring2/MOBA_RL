@@ -107,7 +107,7 @@ Finally, huge reward is given according to result of the game to set the long te
 ## 4. Rendering Environment
 You first need to install Dota 2 from Steam. After installation, please check there is Dota2 folder under /home/[your account]/.steam/steam/steamapps/common/dota 2 beta'. We are going to run Dota2 from terminal command.
 
-Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version]C from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
+Occasionally, update Dota2 from Steam launcher will cause problem such as game stops just right after resetting of Dotaservice at rendering case, not dedicated server. I assume client version of Dota2 client is reason of that problem. At this situation, you can download the [Dota2 Client 5110 version]( https://drive.google.com/drive/folders/1XAMTNUkv3Ra_anz130L_cpH-3rIwT-TL?usp=sharing) from my Google Drive. It is downloades as divided Zip file. After extract them, you need to merge them as one filder and put it under the same folder of the existing Dota2 folder. You need to set game path manually at Dotaservice. 
 
 Next, you need to download and install [dotaservice](https://github.com/TimZaman/dotaservice). In my case, I should modity the _run_dota function of [dotaservice.py](https://github.com/TimZaman/dotaservice/blob/master/dotaservice/dotaservice.py) like below.
 
