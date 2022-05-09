@@ -257,7 +257,7 @@ I am writing explanation for code at Medium as series.
 4. Parsing and watching the replay file of Dota2: https://medium.com/mlearning-ai/playing-moba-game-using-deep-reinforcement-learning-part-4-5fdfbff753df
 
 # Acknowledgements
-Thank you for my first sponsor @erlend-sh.
+Thank you for my first sponsor ["@erlend-sh"](https://github.com/erlend-sh).
 
 # License
 MIT License
