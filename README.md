@@ -15,6 +15,7 @@ Deep Reinforcement Learning for Multiplayer Online Battle Arena
     + [Using Ability to Other Hero](#using-ability-to-other-hero)
   * [6. Replay Parsing and Watching](#6-replay-parsing-and-watching)
 - [Detailed Information](#detailed-information)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 # Prerequisite
@@ -254,6 +255,9 @@ I am writing explanation for code at Medium as series.
 2. Using detailed function of Dota2: https://dohyeongkim.medium.com/playing-moba-game-using-deep-reinforcement-learning-part-2-a31573b0a48d
 3. Training complex MOBA using DRL: https://dohyeongkim.medium.com/playing-moba-game-using-deep-reinforcement-learning-part-3-f5b19b2f984f
 4. Parsing and watching the replay file of Dota2: https://medium.com/mlearning-ai/playing-moba-game-using-deep-reinforcement-learning-part-4-5fdfbff753df
+
+# Acknowledgements
+Thank you for my first sponsor @erlend-sh.
 
 # License
 MIT License
