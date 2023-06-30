@@ -56,7 +56,7 @@ First, move to [dr-derks-mutant-battlegrounds folder](https://github.com/kimbrin
 
 <img src="image/derk_network.png" width="800">
 
-Run below command to run the 50 parallel environemnt. I modified [Seel_RL](https://github.com/google-research/seed_rl) of Google for my MOBA case. 
+Run below command to run the 50 parallel environment. I modified [Seel_RL](https://github.com/google-research/seed_rl) of Google for my MOBA case. 
 
 ```
 $ python learner_1.py --workspace_path [your path]/dr-derks-mutant-battlegrounds/
